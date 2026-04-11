@@ -400,7 +400,7 @@ function WeekStrip({ daily = [] }) {
           let dayStr = i === 0 ? 'Today'
             : i === 1 ? 'Tomorrow'
             : d.date ? format(parseISO(d.date), 'EEEE') : '---';
-          const rainPct = d.precipitation_probability_max || 0;
+          const rainPct = d.precipitation_probability_max ?? 0;
           const maxT = Math.round(d.temperature_max);
           const minT = Math.round(d.temperature_min);
           const range = 40;
@@ -419,7 +419,7 @@ function WeekStrip({ daily = [] }) {
                 fontWeight: i === 0 ? '800' : '500', fontSize: '0.85rem' }}>{dayStr}</span>
               <span style={{ fontSize: '1.3rem', textAlign: 'center' }}>{getWeatherIcon(d.weather_code, true)}</span>
               <span style={{ color: '#60a5fa', fontSize: '0.72rem', fontWeight: '600', textAlign: 'center' }}>
-                {rainPct > 0 ? `💧${rainPct}%` : '—'}
+                💧{Math.round(rainPct)}%
               </span>
               {/* Temp range bar */}
               <div style={{ position: 'relative', height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.08)' }}>
@@ -676,7 +676,7 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             style={{ maxWidth: '560px', marginBottom: '36px' }}>
             <div style={{
-              borderRadius: '18px', overflow: 'hidden',
+              borderRadius: '18px', position: 'relative', zIndex: 50,
               background: 'rgba(255,255,255,0.07)',
               border: '1px solid rgba(255,255,255,0.13)',
               backdropFilter: 'blur(30px)',

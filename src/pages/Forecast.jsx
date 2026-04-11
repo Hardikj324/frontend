@@ -34,11 +34,11 @@ const fullDayLabel = (date) => {
 
 // Animated weather-condition background color
 const conditionColors = {
-  clear:  { from: '#1a1040', to: '#0f3460', accent: '#fbbf24' },
+  clear: { from: '#1a1040', to: '#0f3460', accent: '#fbbf24' },
   cloudy: { from: '#1e293b', to: '#334155', accent: '#94a3b8' },
-  rain:   { from: '#0c1445', to: '#1e3a5f', accent: '#60a5fa' },
-  storm:  { from: '#0d0d1a', to: '#1a0a2e', accent: '#a855f7' },
-  snow:   { from: '#1e3a5f', to: '#0f2744', accent: '#bfdbfe' },
+  rain: { from: '#0c1445', to: '#1e3a5f', accent: '#60a5fa' },
+  storm: { from: '#0d0d1a', to: '#1a0a2e', accent: '#a855f7' },
+  snow: { from: '#1e3a5f', to: '#0f2744', accent: '#bfdbfe' },
 };
 
 const getConditionKey = (code) => {
@@ -53,7 +53,7 @@ const getConditionKey = (code) => {
 // Floating animated particle canvas
 function WeatherParticles({ conditionKey }) {
   const canvasRef = useRef(null);
-  const animRef   = useRef(null);
+  const animRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -72,12 +72,12 @@ function WeatherParticles({ conditionKey }) {
           x: Math.random() * W,
           y: Math.random() * H,
           r: conditionKey === 'snow' ? Math.random() * 3 + 1
-             : conditionKey === 'rain' ? Math.random() * 1.5 + 0.5
-             : Math.random() * 2 + 0.5,
+            : conditionKey === 'rain' ? Math.random() * 1.5 + 0.5
+              : Math.random() * 2 + 0.5,
           speedX: conditionKey === 'rain' ? (Math.random() - 0.3) * 1.5 : (Math.random() - 0.5) * 0.4,
           speedY: conditionKey === 'rain' ? Math.random() * 8 + 4
-                  : conditionKey === 'snow' ? Math.random() * 1 + 0.3
-                  : Math.random() * 0.6 + 0.1,
+            : conditionKey === 'snow' ? Math.random() * 1 + 0.3
+              : Math.random() * 0.6 + 0.1,
           opacity: Math.random() * 0.6 + 0.2,
         });
       }
@@ -122,12 +122,12 @@ function WeatherParticles({ conditionKey }) {
 function TempRing({ value, max, color, size = 80 }) {
   const r = (size - 10) / 2;
   const circ = 2 * Math.PI * r;
-  const pct  = Math.min(Math.max((value + 10) / (max + 10), 0), 1);
+  const pct = Math.min(Math.max((value + 10) / (max + 10), 0), 1);
   return (
     <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={8} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={8} />
       <motion.circle
-        cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={8}
+        cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={8}
         strokeLinecap="round" strokeDasharray={circ}
         initial={{ strokeDashoffset: circ }}
         animate={{ strokeDashoffset: circ * (1 - pct) }}
@@ -180,14 +180,14 @@ const ChartTip = ({ active, payload, label }) => {
 // ─────────────────────────────────────────────
 const TABS = [
   { id: 'cinema', label: '🎬 Sky Cinema' },
-  { id: 'chart',  label: '📈 Trend Lab'  },
-  { id: 'dna',    label: '🧬 Weather DNA' },
-  { id: 'hour',   label: '⏱ Hour by Hour' },
+  { id: 'chart', label: '📈 Trend Lab' },
+  { id: 'dna', label: '🧬 Weather DNA' },
+  { id: 'hour', label: '⏱ Hour by Hour' },
 ];
 
 export default function Forecast() {
   const navigate = useNavigate();
-  const weather   = useWeatherStore(s => s.weather);
+  const weather = useWeatherStore(s => s.weather);
   const [tab, setTab] = useState('cinema');
   const [activeDay, setActiveDay] = useState(0);
   const [chartMetric, setChartMetric] = useState('temp');
@@ -206,13 +206,13 @@ export default function Forecast() {
     </div>
   );
 
-  const daily  = weather?.daily_forecast  || [];
+  const daily = weather?.daily_forecast || [];
   const hourly = weather?.hourly_forecast || [];
-  const day    = daily[activeDay];
+  const day = daily[activeDay];
   if (!day) return null;
 
   const conditionKey = getConditionKey(day.weather_code);
-  const palette      = conditionColors[conditionKey];
+  const palette = conditionColors[conditionKey];
 
   // Chart data arrays
   const tempChart = daily.slice(0, 7).map(d => ({
@@ -237,7 +237,7 @@ export default function Forecast() {
     Heat: Math.round(((d.temperature_max + 20) / 80) * 100),
     Rain: Math.round(d.precipitation_probability_max),
     Wind: Math.round((d.wind_speed_max / 120) * 100),
-    UV:   Math.round((d.uv_index_max / 12) * 100),
+    UV: Math.round((d.uv_index_max / 12) * 100),
     Cloud: d.precipitation_probability_max > 50 ? 80 : d.precipitation_probability_max > 20 ? 50 : 20,
   }));
 
@@ -309,15 +309,19 @@ export default function Forecast() {
           <motion.div key="cinema" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
 
             {/* Hero Scene */}
-            <div style={{ position: 'relative', borderRadius: '24px', overflow: 'hidden', marginBottom: '1.5rem', height: '320px',
+            <div style={{
+              position: 'relative', borderRadius: '24px', overflow: 'hidden', marginBottom: '1.5rem', height: '320px',
               background: `linear-gradient(160deg, ${palette.from} 0%, ${palette.to} 100%)`,
-              border: `1px solid ${palette.accent}30` }}>
+              border: `1px solid ${palette.accent}30`
+            }}>
               <WeatherParticles conditionKey={conditionKey} />
 
               {/* Glow orb */}
-              <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '250px', height: '250px',
+              <div style={{
+                position: 'absolute', top: '-60px', right: '-60px', width: '250px', height: '250px',
                 borderRadius: '50%', background: `radial-gradient(circle, ${palette.accent}20 0%, transparent 70%)`,
-                filter: 'blur(40px)' }} />
+                filter: 'blur(40px)'
+              }} />
 
               {/* Content */}
               <div style={{ position: 'relative', zIndex: 2, padding: '2.5rem', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -376,10 +380,10 @@ export default function Forecast() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px,1fr))', gap: '12px', marginBottom: '1.5rem' }}>
               {[
                 { icon: FiSunrise, label: 'Sunrise', val: day.sunrise ? formatTime(day.sunrise) : '--', color: '#fbbf24', bg: 'rgba(251,191,36,0.08)' },
-                { icon: FiSunset,  label: 'Sunset',  val: day.sunset  ? formatTime(day.sunset)  : '--', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
-                { icon: FiWind,    label: 'Max Wind', val: `${Math.round(day.wind_speed_max)} km/h`, color: '#a3e635', bg: 'rgba(163,230,53,0.08)' },
+                { icon: FiSunset, label: 'Sunset', val: day.sunset ? formatTime(day.sunset) : '--', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
+                { icon: FiWind, label: 'Max Wind', val: `${Math.round(day.wind_speed_max)} km/h`, color: '#a3e635', bg: 'rgba(163,230,53,0.08)' },
                 { icon: FiDroplet, label: 'Rain Prob', val: `${Math.round(day.precipitation_probability_max)}%`, color: '#60a5fa', bg: 'rgba(96,165,250,0.08)' },
-                { icon: FiSun,     label: 'UV Index', val: `${formatUVIndex(day.uv_index_max)}`, color: '#fb923c', bg: 'rgba(251,146,60,0.08)' },
+                { icon: FiSun, label: 'UV Index', val: `${formatUVIndex(day.uv_index_max)}`, color: '#fb923c', bg: 'rgba(251,146,60,0.08)' },
                 { icon: FiNavigation, label: 'Wind Dir', val: day.wind_direction_dominant != null ? `${day.wind_direction_dominant}°` : '--', color: '#c084fc', bg: 'rgba(192,132,252,0.08)' },
               ].map(({ icon: Icon, label, val, color, bg }, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}
@@ -400,9 +404,7 @@ export default function Forecast() {
             <div className="card" style={{ padding: '1.5rem' }}>
               <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.9rem', marginBottom: '1.2rem' }}>Day Condition Profile</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                <MetricBar label="Rain Probability" value={`${Math.round(day.precipitation_probability_max)}%`} max={100} color="#60a5fa" icon={FiDroplet}
-                  // For bar width, pass the raw number
-                />
+
                 {[
                   { label: 'Rain Probability', value: `${Math.round(day.precipitation_probability_max)}%`, rawValue: day.precipitation_probability_max, max: 100, color: '#60a5fa', icon: FiDroplet },
                   { label: 'Wind Speed', value: `${Math.round(day.wind_speed_max)} km/h`, rawValue: day.wind_speed_max, max: 120, color: '#a3e635', icon: FiWind },
@@ -437,7 +439,7 @@ export default function Forecast() {
               {[
                 { id: 'temp', label: '🌡 Temperature', color: '#fb923c' },
                 { id: 'rain', label: '💧 Rain Chance', color: '#60a5fa' },
-                { id: 'wind', label: '💨 Wind Speed',  color: '#a3e635' },
+                { id: 'wind', label: '💨 Wind Speed', color: '#a3e635' },
               ].map(m => (
                 <button key={m.id} onClick={() => setChartMetric(m.id)}
                   style={{
@@ -462,11 +464,11 @@ export default function Forecast() {
                       <AreaChart data={tempChart} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
                         <defs>
                           <linearGradient id="gMax" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%"  stopColor="#fb923c" stopOpacity={0.45} />
+                            <stop offset="5%" stopColor="#fb923c" stopOpacity={0.45} />
                             <stop offset="95%" stopColor="#fb923c" stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="gMin" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%"  stopColor="#93c5fd" stopOpacity={0.45} />
+                            <stop offset="5%" stopColor="#93c5fd" stopOpacity={0.45} />
                             <stop offset="95%" stopColor="#93c5fd" stopOpacity={0} />
                           </linearGradient>
                         </defs>
@@ -515,7 +517,7 @@ export default function Forecast() {
                       <AreaChart data={windChart} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
                         <defs>
                           <linearGradient id="windGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%"  stopColor="#a3e635" stopOpacity={0.45} />
+                            <stop offset="5%" stopColor="#a3e635" stopOpacity={0.45} />
                             <stop offset="95%" stopColor="#a3e635" stopOpacity={0} />
                           </linearGradient>
                         </defs>
@@ -544,8 +546,8 @@ export default function Forecast() {
                   { axis: 'Heat', val: dnaData[activeDay]?.Heat || 0 },
                   { axis: 'Rain', val: dnaData[activeDay]?.Rain || 0 },
                   { axis: 'Wind', val: dnaData[activeDay]?.Wind || 0 },
-                  { axis: 'UV',   val: dnaData[activeDay]?.UV   || 0 },
-                  { axis: 'Cloud',val: dnaData[activeDay]?.Cloud || 0 },
+                  { axis: 'UV', val: dnaData[activeDay]?.UV || 0 },
+                  { axis: 'Cloud', val: dnaData[activeDay]?.Cloud || 0 },
                 ]}>
                   <PolarGrid stroke="rgba(255,255,255,0.07)" />
                   <PolarAngleAxis dataKey="axis" tick={{ fill: 'var(--text-secondary)', fontSize: 13, fontWeight: 700 }} />
@@ -561,17 +563,19 @@ export default function Forecast() {
                 {dnaData.map((d, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
                     onClick={() => setActiveDay(i)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', cursor: 'pointer',
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', cursor: 'pointer',
                       background: activeDay === i ? `${palette.accent}15` : 'rgba(255,255,255,0.03)',
                       border: activeDay === i ? `1px solid ${palette.accent}40` : '1px solid transparent',
-                      transition: 'all 0.2s' }}>
+                      transition: 'all 0.2s'
+                    }}>
                     <span style={{ fontSize: '1.3rem', width: '28px', textAlign: 'center' }}>{getWeatherIcon(daily[i]?.weather_code, true)}</span>
                     <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: '700', width: '70px', flexShrink: 0 }}>{d.day}</span>
                     {[
                       { label: 'Heat', val: d.Heat, color: '#fb923c' },
                       { label: 'Rain', val: d.Rain, color: '#60a5fa' },
                       { label: 'Wind', val: d.Wind, color: '#a3e635' },
-                      { label: 'UV',   val: d.UV,   color: '#fbbf24' },
+                      { label: 'UV', val: d.UV, color: '#fbbf24' },
                     ].map(m => (
                       <div key={m.label} style={{ flex: 1 }}>
                         <div style={{ height: '5px', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
@@ -605,7 +609,7 @@ export default function Forecast() {
                 }))} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="hourGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor={palette.accent} stopOpacity={0.4} />
+                      <stop offset="5%" stopColor={palette.accent} stopOpacity={0.4} />
                       <stop offset="95%" stopColor={palette.accent} stopOpacity={0} />
                     </linearGradient>
                   </defs>
@@ -626,9 +630,11 @@ export default function Forecast() {
                 const pal = conditionColors[condKey];
                 return (
                   <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-                    style={{ flex: '0 0 auto', width: '90px', borderRadius: '16px', padding: '14px 10px', textAlign: 'center',
+                    style={{
+                      flex: '0 0 auto', width: '90px', borderRadius: '16px', padding: '14px 10px', textAlign: 'center',
                       background: `linear-gradient(180deg, ${pal.from}cc, ${pal.to}cc)`,
-                      border: `1px solid ${pal.accent}30`, backdropFilter: 'blur(10px)' }}>
+                      border: `1px solid ${pal.accent}30`, backdropFilter: 'blur(10px)'
+                    }}>
                     <p style={{ color: pal.accent, fontSize: '0.68rem', fontWeight: '700', marginBottom: '8px' }}>
                       {h.time ? format(parseISO(h.time), 'HH:mm') : '--'}
                     </p>

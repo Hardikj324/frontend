@@ -4,8 +4,15 @@ import { Toaster } from 'react-hot-toast';
 import Header from '../components/Common/Header';
 import ErrorBoundary from '../components/Common/ErrorBoundary';
 import { useAlertChecker } from '../hooks/useAlertChecker';
+import { useWeather } from '../hooks/useWeather';
+import { useWeatherStore } from '../store/weatherStore';
 
 export default function MainLayout() {
+  const selectedLocation = useWeatherStore(s => s.selectedLocation);
+  
+  // Keep weather data synced globally based on selected location
+  useWeather(selectedLocation?.lat, selectedLocation?.lon);
+  
   // Start the background alert checker
   useAlertChecker();
 

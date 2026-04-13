@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX, FiSearch, FiMapPin, FiPlus, FiEdit2, FiCheck } from 'react-icons/fi';
-import { saveLocations } from '../services/locationsAPI';
+import { saveLocations } from '../services/locationsAPI'; import { API_BASE_URL } from '../utils/constants';
 
 // Inline city search (no dep on LocationAutocomplete to keep modal self-contained)
 function CitySearch({ onSelect, placeholder = 'Search a city…' }) {
-  const [q, setQ]           = useState('');
+  const [q, setQ] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [open, setOpen]      = useState(false);
-  const timer                = React.useRef(null);
+  const [open, setOpen] = useState(false);
+  const timer = React.useRef(null);
 
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
@@ -73,9 +73,9 @@ function CitySearch({ onSelect, placeholder = 'Search a city…' }) {
 // ── Main Modal ────────────────────────────────────────────────────
 export default function SaveLocationModal({ isOpen, onClose, onSaved }) {
   const MAX = 4;
-  const [cities, setCities]   = useState([]);   // [{ name, latitude, longitude, country }]
-  const [saving, setSaving]   = useState(false);
-  const [error, setError]     = useState('');
+  const [cities, setCities] = useState([]);   // [{ name, latitude, longitude, country }]
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [editIdx, setEditIdx] = useState(null);  // which slot is being edited
 
   // Load existing saved cities when modal opens
@@ -83,7 +83,7 @@ export default function SaveLocationModal({ isOpen, onClose, onSaved }) {
     if (!isOpen) return;
     (async () => {
       try {
-        const r = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/weather/saved-locations`, {
+        const r = await fetch(`${API_BASE_URL}/weather/saved-locations`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
         });
         if (!r.ok) return;

@@ -21,7 +21,7 @@ async function reverseGeocode(lat, lng) {
       d.name;
     const country = d.address?.country;
     if (name) return `${name}, ${country || ''}`.trim();
-  } catch {}
+  } catch { }
   return `${lat.toFixed(2)}°, ${lng.toFixed(2)}°`;
 }
 
@@ -33,6 +33,7 @@ export default function WeatherGlobe({ onLocationSelect, searchedLocation, userL
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const containerRef = useRef(null);
 
+  //equirectangular map image
   const globeImage = darkMode
     ? '//unpkg.com/three-globe/example/img/earth-night.jpg'
     : '//unpkg.com/three-globe/example/img/earth-blue-marble.jpg';
@@ -102,7 +103,7 @@ export default function WeatherGlobe({ onLocationSelect, searchedLocation, userL
   }, []);
 
   const pinElement = useCallback((d) => {
-   
+
     const root = document.createElement('div');
     root.style.cssText = `
       position: absolute;
@@ -111,7 +112,7 @@ export default function WeatherGlobe({ onLocationSelect, searchedLocation, userL
       pointer-events: none;
     `;
 
-    
+
     const dot = document.createElement('div');
     dot.style.cssText = `
       position: absolute;
@@ -185,8 +186,7 @@ export default function WeatherGlobe({ onLocationSelect, searchedLocation, userL
             globeImageUrl={globeImage}
             bumpImageUrl={bumpImage}
             backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-            atmosphereColor={darkMode ? '#5ab5ff' : '#4a90d9'}
-            atmosphereAltitude={0.22}
+            showAtmosphere={false}
             onGlobeReady={handleGlobeReady}
             onGlobeClick={handleGlobeClick}
             htmlElementsData={pins}
@@ -205,17 +205,6 @@ export default function WeatherGlobe({ onLocationSelect, searchedLocation, userL
           />
         )}
 
-        {/* Bottom fade */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0, left: 0, right: 0,
-            height: '80px',
-            background: 'linear-gradient(transparent, var(--bg-primary))',
-            pointerEvents: 'none',
-            zIndex: 5,
-          }}
-        />
 
         {/* Active pin badge */}
         <AnimatePresence>

@@ -41,33 +41,33 @@
 }
 
 html.light {
-  --bg-primary:    #f4f7fb;
-  --bg-card:       rgba(255, 255, 255, 0.72);
-  --bg-header:     rgba(255, 255, 255, 0.85);
-  --bg-input:      rgba(241, 245, 249, 0.9);
-  --bg-dropdown:   rgba(255, 255, 255, 0.98);
+  --bg-primary:    #fdfbf7; /* Very soft off-white paper color */
+  --bg-card:       rgba(255, 255, 255, 0.9);
+  --bg-header:     rgba(253, 251, 247, 0.92);
+  --bg-input:      rgba(244, 242, 238, 0.85);
+  --bg-dropdown:   #ffffff;
 
-  --text-primary:   #1e293b;
-  --text-secondary: #475569;
-  --text-muted:     #94a3b8;
-  --text-label:     #64748b;
+  --text-primary:   #292524; /* Soft warm dark gray */
+  --text-secondary: #57534e;
+  --text-muted:     #a8a29e;
+  --text-label:     #d6d3d1;
 
-  --border-card:        rgba(148, 163, 184, 0.12);
-  --border-input:       rgba(148, 163, 184, 0.2);
-  --border-input-focus: rgba(100, 200, 255, 0.5);
-  --border-primary:     rgba(148, 163, 184, 0.1);
+  --border-card:        rgba(214, 211, 209, 0.5);
+  --border-input:       rgba(214, 211, 209, 0.8);
+  --border-input-focus: rgba(120, 113, 108, 0.4);
+  --border-primary:     rgba(214, 211, 209, 0.4);
 
-  --accent:        #0891b2;
-  --accent-hover:  rgba(8, 145, 178, 0.08);
-  --accent-subtle: rgba(8, 145, 178, 0.04);
-  --accent-glow:   rgba(8, 145, 178, 0.15);
+  --accent:        #57534e; /* Neutral elegant accent instead of bright blue */
+  --accent-hover:  rgba(87, 83, 78, 0.08);
+  --accent-subtle: rgba(87, 83, 78, 0.04);
+  --accent-glow:   rgba(87, 83, 78, 0.08);
 
-  --shadow-sm:   0 2px 8px rgba(15, 23, 42, 0.04);
-  --shadow-md:   0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
-  --shadow-lg:   0 20px 50px -12px rgba(15, 23, 42, 0.12);
-  --shadow-glow: 0 0 20px rgba(8, 145, 178, 0.1);
+  --shadow-sm:   0 1px 2px rgba(41, 37, 36, 0.03);
+  --shadow-md:   0 4px 10px rgba(41, 37, 36, 0.03);
+  --shadow-lg:   0 10px 20px rgba(41, 37, 36, 0.04);
+  --shadow-glow: 0 0 10px rgba(87, 83, 78, 0.05);
 
-  --gradient-body: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  --gradient-body: linear-gradient(135deg, #fdfbf7 0%, #f5f4ef 100%);
 }
 
 /* ── Reset ─────────────────────────────────────────── */
@@ -88,6 +88,12 @@ button { font-family:inherit; cursor:pointer; }
 button:disabled { cursor:not-allowed; opacity:0.5; }
 input, select, textarea { font-family:inherit; font-size:inherit; }
 input::placeholder, textarea::placeholder { color:var(--text-muted); }
+
+/* Hide default browser eye button (Edge/IE) and clear button */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
 
 /* ── Scrollbars ─────────────────────────────────────── */
 ::-webkit-scrollbar { width:5px; height:5px; }

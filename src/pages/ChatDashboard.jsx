@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/authStore';
 import { useWeatherStore } from '../store/weatherStore';
 import { getChatHistory, uploadChatMedia } from '../services/chatAPI';
+import { BASE_URL } from '../utils/constants';
 import LocationAutocomplete from '../components/Search/LocationAutocomplete';
 
 export default function ChatDashboard() {
@@ -122,10 +123,9 @@ export default function ChatDashboard() {
       try {
         mediaUrl = await uploadChatMedia(selectedFile);
         
-        // Since we are running backend locally on 8000, 
-        // we might need to prepend the backend host to the URL if not proxied
-        if (window.location.hostname === 'localhost' && mediaUrl.startsWith('/uploads')) {
-            mediaUrl = `http://localhost:8000${mediaUrl}`;
+        // Ensure absolute URL for media if it's a relative path from uploads
+        if (mediaUrl.startsWith('/uploads')) {
+            mediaUrl = `${BASE_URL}${mediaUrl}`;
         }
 
       } catch (err) {

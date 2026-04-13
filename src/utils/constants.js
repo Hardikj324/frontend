@@ -1,4 +1,6 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const apiUrl = import.meta.env.VITE_API_URL;
+export const BASE_URL = apiUrl != null ? apiUrl.replace('/api', '') : 'http://localhost:8000';
+export const API_BASE_URL = apiUrl != null ? apiUrl : `${BASE_URL}/api`;
 
 export const WEATHER_CODES = {
   0: 'Clear sky',

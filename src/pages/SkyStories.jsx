@@ -3,8 +3,9 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from 'framer-motio
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { getWeatherIcon } from '../utils/weatherHelpers';
+import { API_BASE_URL } from '../utils/constants';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = API_BASE_URL;
 
 // ─── Weather gradient themes ──────────────────────────────────
 function getCardTheme(code, isDay) {
@@ -379,15 +380,15 @@ function WorldStats({ cities }) {
           whileHover={{ scale: 1.03, y: -2 }}
           style={{
             padding: '16px 20px', borderRadius: '20px',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-card)',
             backdropFilter: 'blur(20px)',
           }}
         >
           <p style={{ fontSize: '1.4rem', marginBottom: '6px' }}>{icon}</p>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>{label}</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>{label}</p>
           <p style={{ color, fontWeight: '900', fontSize: '1rem' }}>{value}</p>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>{sub}</p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{sub}</p>
         </motion.div>
       ))}
     </motion.div>
@@ -422,10 +423,10 @@ function SortDropdown({ sortBy, setSortBy }) {
         style={{
           display: 'flex', alignItems: 'center', gap: '8px',
           padding: '8px 14px', borderRadius: '99px', cursor: 'pointer', border: 'none',
-          background: open ? 'rgba(100,181,246,0.18)' : 'rgba(255,255,255,0.07)',
-          border: open ? '1px solid rgba(100,181,246,0.4)' : '1px solid rgba(255,255,255,0.12)',
+          background: open ? 'var(--bg-input)' : 'var(--bg-card)',
+          border: open ? '1px solid var(--border-input)' : '1px solid var(--border-card)',
           backdropFilter: 'blur(16px)',
-          color: open ? '#64b5f6' : 'rgba(255,255,255,0.65)',
+          color: open ? 'var(--accent)' : 'var(--text-primary)',
           fontSize: '0.8rem', fontWeight: '700',
           transition: 'all 0.2s',
         }}
@@ -449,9 +450,9 @@ function SortDropdown({ sortBy, setSortBy }) {
             style={{
               position: 'absolute', top: 'calc(100% + 8px)', left: 0, zIndex: 200,
               minWidth: '180px', borderRadius: '18px', overflow: 'hidden',
-              background: 'rgba(8,16,38,0.97)',
-              border: '1px solid rgba(100,181,246,0.2)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)',
+              background: 'var(--bg-dropdown)',
+              border: '1px solid var(--border-input)',
+              boxShadow: 'var(--shadow-lg)',
               backdropFilter: 'blur(30px)',
               padding: '6px',
             }}
@@ -469,19 +470,19 @@ function SortDropdown({ sortBy, setSortBy }) {
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
                     padding: '10px 12px', borderRadius: '12px', border: 'none',
-                    background: isActive ? 'rgba(100,181,246,0.15)' : 'transparent',
+                    background: isActive ? 'var(--accent-subtle)' : 'transparent',
                     cursor: 'pointer', transition: 'all 0.15s',
-                    borderLeft: isActive ? '2px solid #64b5f6' : '2px solid transparent',
+                    borderLeft: isActive ? '2px solid var(--accent)' : '2px solid transparent',
                   }}
                 >
                   <span style={{ fontSize: '1rem' }}>{opt.icon}</span>
                   <span style={{
-                    color: isActive ? '#64b5f6' : 'rgba(255,255,255,0.65)',
+                    color: isActive ? 'var(--accent)' : 'var(--text-primary)',
                     fontWeight: isActive ? '800' : '500',
                     fontSize: '0.82rem',
                   }}>{opt.label}</span>
                   {isActive && (
-                    <span style={{ marginLeft: 'auto', color: '#64b5f6', fontSize: '0.7rem' }}>✓</span>
+                    <span style={{ marginLeft: 'auto', color: 'var(--accent)', fontSize: '0.7rem' }}>✓</span>
                   )}
                 </motion.button>
               );
@@ -545,7 +546,7 @@ export default function SkyStories() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(155deg, #020818 0%, #060d20 50%, #0a1530 100%)', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', background: 'transparent', position: 'relative' }}>
 
       {/* ── Animated background orbs ── */}
       <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -572,15 +573,15 @@ export default function SkyStories() {
             <div>
               <h1 style={{
                 fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: '900', lineHeight: 1.1,
-                background: 'linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.4) 100%)',
+                background: 'var(--text-primary)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                 letterSpacing: '-2px', marginBottom: '8px',
               }}>
                 🌍 Sky Stories
               </h1>
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '1rem', fontWeight: '500' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '500' }}>
                 Live weather from 20 cities across the globe · refreshed now
-                {lastRefresh && <span style={{ color: 'rgba(255,255,255,0.25)', marginLeft: '8px' }}>
+                {lastRefresh && <span style={{ color: 'var(--text-muted)', marginLeft: '8px' }}>
                   at {lastRefresh.toLocaleTimeString()}
                 </span>}
               </p>
@@ -590,9 +591,9 @@ export default function SkyStories() {
               onClick={fetchPulse}
               disabled={loading}
               style={{
-                padding: '12px 24px', borderRadius: '50px', border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)',
-                color: '#fff', cursor: 'pointer', fontWeight: '700', fontSize: '0.9rem',
+                padding: '12px 24px', borderRadius: '50px', border: '1px solid var(--border-input)',
+                background: 'var(--bg-card)', backdropFilter: 'blur(10px)',
+                color: 'var(--text-primary)', cursor: 'pointer', fontWeight: '700', fontSize: '0.9rem',
                 display: 'flex', alignItems: 'center', gap: '8px',
               }}
             >
@@ -617,10 +618,10 @@ export default function SkyStories() {
                   onClick={() => setFilter(key)}
                   style={{
                     padding: '7px 14px', borderRadius: '99px', border: 'none', cursor: 'pointer',
-                    background: filter === key ? 'rgba(100,181,246,0.25)' : 'rgba(255,255,255,0.06)',
-                    color: filter === key ? '#64b5f6' : 'rgba(255,255,255,0.5)',
+                    background: filter === key ? 'var(--accent-subtle)' : 'var(--bg-card)',
+                    color: filter === key ? 'var(--accent)' : 'var(--text-secondary)',
                     fontSize: '0.8rem', fontWeight: '700',
-                    border: filter === key ? '1px solid rgba(100,181,246,0.4)' : '1px solid rgba(255,255,255,0.1)',
+                    border: filter === key ? '1px solid var(--border-input-focus)' : '1px solid var(--border-card)',
                     backdropFilter: 'blur(10px)',
                   }}
                 >{label}</motion.button>
@@ -647,7 +648,7 @@ export default function SkyStories() {
                 />
               ))}
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontWeight: '600' }}>Fetching live data from 20 cities…</p>
+            <p style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Fetching live data from 20 cities…</p>
           </div>
         )}
 
@@ -671,7 +672,7 @@ export default function SkyStories() {
         {!loading && !error && (
           <>
             {filtered.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '5rem', color: 'rgba(255,255,255,0.3)' }}>
+              <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--text-muted)' }}>
                 <p style={{ fontSize: '3rem' }}>🌐</p>
                 <p style={{ fontWeight: '700', marginTop: '12px' }}>No cities match this filter</p>
               </div>

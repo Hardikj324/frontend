@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { useWeather } from '../hooks/useWeather';
+import { useDarkMode } from '../hooks/useDarkMode';
 import { useWeatherStore } from '../store/weatherStore';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import LocationAutocomplete from '../components/Search/LocationAutocomplete';
@@ -52,9 +53,9 @@ function LiveClock({ timezone }) {
 
     return (
       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', fontVariantNumeric: 'tabular-nums' }}>
-        <span style={{ color: '#fff', fontWeight: '800', letterSpacing: '0.02em' }}>{hms}</span>
+        <span style={{ color: 'var(--text-primary)', fontWeight: '800', letterSpacing: '0.02em' }}>{hms}</span>
         <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem' }}>•</span>
-        <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: '600' }}>{dateStr}</span>
+        <span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>{dateStr}</span>
         {timezone && (
           <>
             <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem' }}>•</span>
@@ -68,111 +69,7 @@ function LiveClock({ timezone }) {
   }
 }
 
-// ─── ANIMATED BACKGROUND ─────────────────────────────────────
-function AtmosphericBg({ weatherCode, isDay }) {
-  const canvasRef = useRef(null);
-  const animRef   = useRef(null);
 
-  const theme = useMemo(() => {
-    if (!isDay) return { layers: ['#020818', '#060d20'], particles: 'star', accent: '#4f8ef7' };
-    if (weatherCode === 0 || weatherCode === 1)
-      return { layers: ['#0f1b3d', '#1a3a6b'], particles: 'sun', accent: '#fbbf24' };
-    if (weatherCode >= 95)
-      return { layers: ['#07090f', '#0b1525'], particles: 'lightning', accent: '#a855f7' };
-    if (weatherCode >= 71 && weatherCode <= 77)
-      return { layers: ['#0e1929', '#162840'], particles: 'snow', accent: '#bfdbfe' };
-    if (weatherCode >= 50)
-      return { layers: ['#080d1a', '#111c30'], particles: 'rain', accent: '#60a5fa' };
-    return { layers: ['#0b1428', '#162240'], particles: 'cloud', accent: '#64b5f6' };
-  }, [weatherCode, isDay]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
-    resize();
-    window.addEventListener('resize', resize);
-
-    let particles = [];
-    const W = () => canvas.width, H = () => canvas.height;
-    const COUNT = theme.particles === 'rain' ? 120 : theme.particles === 'snow' ? 60 : 80;
-
-    const init = () => {
-      particles = Array.from({ length: COUNT }, () => ({
-        x: Math.random() * W(), y: Math.random() * H(),
-        size: Math.random() * 2.5 + 0.5,
-        speedX: theme.particles === 'rain' ? (Math.random() - 0.4) * 2 : (Math.random() - 0.5) * 0.3,
-        speedY: theme.particles === 'rain' ? Math.random() * 10 + 5
-          : theme.particles === 'snow' ? Math.random() * 0.8 + 0.2
-          : Math.random() * 0.15 + 0.05,
-        opacity: Math.random() * 0.7 + 0.1,
-        twinkle: Math.random() * Math.PI * 2,
-        twinkleSpeed: Math.random() * 0.04 + 0.01,
-      }));
-    };
-    init();
-
-    const draw = () => {
-      ctx.clearRect(0, 0, W(), H());
-
-      // Draw gradient bg
-      const grd = ctx.createLinearGradient(0, 0, 0, H());
-      grd.addColorStop(0, theme.layers[0]);
-      grd.addColorStop(1, theme.layers[1]);
-      ctx.fillStyle = grd;
-      ctx.fillRect(0, 0, W(), H());
-
-      // Subtle radial glow centre
-      const radial = ctx.createRadialGradient(W() * 0.5, H() * 0.3, 0, W() * 0.5, H() * 0.3, W() * 0.55);
-      radial.addColorStop(0, theme.accent + '18');
-      radial.addColorStop(1, 'transparent');
-      ctx.fillStyle = radial;
-      ctx.fillRect(0, 0, W(), H());
-
-      particles.forEach(p => {
-        p.twinkle += p.twinkleSpeed;
-        const alpha = p.opacity * (0.5 + 0.5 * Math.sin(p.twinkle));
-
-        if (theme.particles === 'rain') {
-          ctx.strokeStyle = `rgba(147,197,253,${alpha * 0.5})`;
-          ctx.lineWidth = p.size * 0.7;
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p.x + p.speedX * 2, p.y + 18);
-          ctx.stroke();
-        } else if (theme.particles === 'snow') {
-          ctx.fillStyle = `rgba(219,234,254,${alpha})`;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size + 1, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          // stars / ambient
-          ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 0.7, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        p.x += p.speedX; p.y += p.speedY;
-        if (p.y > H() + 20) { p.y = -10; p.x = Math.random() * W(); }
-        if (p.x > W() + 10 || p.x < -10) p.x = Math.random() * W();
-      });
-
-      animRef.current = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => {
-      cancelAnimationFrame(animRef.current);
-      window.removeEventListener('resize', resize);
-    };
-  }, [theme]);
-
-  return (
-    <canvas ref={canvasRef}
-      style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }} />
-  );
-}
 
 // ─── MAGNETIC CURSOR GLOW ─────────────────────────────────────
 function CursorGlow({ accent }) {
@@ -216,18 +113,18 @@ function HeroTemp({ current, locationName, updated }) {
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px' }}>
             <span style={{
               fontSize: 'clamp(6rem, 15vw, 9rem)', fontWeight: '900', lineHeight: 1,
-              background: 'linear-gradient(135deg, #ffffff 30%, rgba(255,255,255,0.4) 100%)',
+              background: 'linear-gradient(135deg, var(--text-primary) 30%, var(--text-muted) 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               letterSpacing: '-6px', fontVariantNumeric: 'tabular-nums',
             }}>
               {Math.round(current.temperature)}
             </span>
-            <span style={{ fontSize: '3rem', fontWeight: '300', color: 'rgba(255,255,255,0.5)', marginBottom: '12px' }}>°C</span>
+            <span style={{ fontSize: '3rem', fontWeight: '300', color: 'var(--text-secondary)', marginBottom: '12px' }}>°C</span>
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '1.1rem', fontWeight: '500', marginTop: '4px' }}>
+          <p style={{ color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '500', marginTop: '4px' }}>
             {current.condition_description}
           </p>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', marginTop: '2px' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '2px' }}>
             Feels like {Math.round(current.feels_like)}° · Updated {updated}
           </p>
         </div>
@@ -268,8 +165,8 @@ function MetricPill({ icon: Icon, label, value, color, delay = 0 }) {
       style={{
         display: 'flex', alignItems: 'center', gap: '10px',
         padding: '12px 16px', borderRadius: '16px',
-        background: 'rgba(255,255,255,0.06)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-card)',
         backdropFilter: 'blur(20px)',
         cursor: 'default',
       }}
@@ -280,9 +177,9 @@ function MetricPill({ icon: Icon, label, value, color, delay = 0 }) {
         <Icon size={16} style={{ color }} />
       </div>
       <div>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', fontWeight: '700',
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: '700',
           textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>{label}</p>
-        <p style={{ color: '#fff', fontWeight: '800', fontSize: '0.9rem' }}>{value}</p>
+        <p style={{ color: 'var(--text-primary)', fontWeight: '800', fontSize: '0.9rem' }}>{value}</p>
       </div>
     </motion.div>
   );
@@ -327,14 +224,14 @@ function HourlyTimeline({ hourly = [] }) {
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
       style={{
         borderRadius: '24px', overflow: 'hidden',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-card)',
         backdropFilter: 'blur(30px)',
       }}
     >
       {/* Header */}
       <div style={{ padding: '1.25rem 1.5rem 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: '700', fontSize: '0.75rem',
+        <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
           textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <FiClock size={12} /> Next 12 Hours
         </p>
@@ -365,7 +262,7 @@ function HourlyTimeline({ hourly = [] }) {
                 {isNow ? 'Now' : h.time ? format(parseISO(h.time), 'HH:mm') : '--'}
               </p>
               <p style={{ fontSize: '1.3rem', marginBottom: '6px' }}>{getWeatherIcon(h.weather_code, h.is_day)}</p>
-              <p style={{ color: '#fff', fontWeight: '800', fontSize: '0.85rem' }}>{Math.round(h.temperature)}°</p>
+              <p style={{ color: 'var(--text-primary)', fontWeight: '800', fontSize: '0.85rem' }}>{Math.round(h.temperature)}°</p>
               <p style={{ color: '#60a5fa', fontSize: '0.6rem', marginTop: '3px' }}>
                 {h.precipitation_probability != null ? `${h.precipitation_probability}%` : ''}
               </p>
@@ -385,13 +282,13 @@ function WeekStrip({ daily = [] }) {
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
       style={{
         borderRadius: '24px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-card)',
         backdropFilter: 'blur(30px)',
         padding: '1.25rem 1.5rem',
       }}
     >
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: '700', fontSize: '0.75rem',
+      <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
         textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>
         📅 7-Day Outlook
       </p>
@@ -431,7 +328,7 @@ function WeekStrip({ daily = [] }) {
               </div>
               <div style={{ textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end', alignItems: 'baseline' }}>
                 <span style={{ color: '#fb923c', fontWeight: '800', fontSize: '0.88rem' }}>{maxT}°</span>
-                <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem' }}>{minT}°</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{minT}°</span>
               </div>
             </motion.div>
           );
@@ -462,13 +359,13 @@ function AQIPanel({ airQuality }) {
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}
       style={{
         borderRadius: '24px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-card)',
         backdropFilter: 'blur(30px)',
         padding: '1.5rem',
       }}
     >
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: '700', fontSize: '0.75rem',
+      <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
         textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>
         💨 Air Quality
       </p>
@@ -489,12 +386,12 @@ function AQIPanel({ airQuality }) {
 
         <div style={{ flex: 1 }}>
           <p style={{ color: level.color, fontWeight: '800', fontSize: '0.95rem', marginBottom: '4px' }}>{rec.icon} {level.label}</p>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', lineHeight: 1.5, marginBottom: '10px' }}>{rec.advice}</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', lineHeight: 1.5, marginBottom: '10px' }}>{rec.advice}</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
             {pollutants.map(({ l, v, u }) => (
-              <div key={l} style={{ padding: '6px 10px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.62rem', fontWeight: '700' }}>{l}</p>
-                <p style={{ color: '#fff', fontWeight: '800', fontSize: '0.82rem' }}>{v?.toFixed(1)} <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.6rem' }}>{u}</span></p>
+              <div key={l} style={{ padding: '6px 10px', borderRadius: '10px', background: 'var(--bg-card)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.62rem', fontWeight: '700' }}>{l}</p>
+                <p style={{ color: 'var(--text-primary)', fontWeight: '800', fontSize: '0.82rem' }}>{v?.toFixed(1)} <span style={{ color: 'var(--text-muted)', fontSize: '0.6rem' }}>{u}</span></p>
               </div>
             ))}
           </div>
@@ -535,18 +432,18 @@ function InsightChip({ weather }) {
       style={{
         display: 'flex', alignItems: 'flex-start', gap: '12px',
         padding: '14px 18px', borderRadius: '18px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-card)',
         backdropFilter: 'blur(20px)',
       }}
     >
       <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>📖</span>
       <div>
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem', fontWeight: '800',
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '800',
           textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>
           Sky Insight
         </p>
-        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: 1.6 }}>{story}</p>
+        <p style={{ color: 'var(--text-primary)', fontSize: '0.9rem', lineHeight: 1.6 }}>{story}</p>
       </div>
     </motion.div>
   );
@@ -556,6 +453,7 @@ function InsightChip({ weather }) {
 // MAIN HOME PAGE
 // ═══════════════════════════════════════════════════════════════════
 export default function Home() {
+  const { darkMode } = useDarkMode();
   const [searchParams] = useSearchParams();
   const { location: geoLoc, error: geoError, loading: geoLoading } = useGeolocation();
   const setSelectedLocation = useWeatherStore(s => s.setSelectedLocation);
@@ -597,22 +495,18 @@ export default function Home() {
     <div style={{
       position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center', gap: '20px',
-      background: 'linear-gradient(135deg, #020818 0%, #060d20 100%)',
+      background: 'transparent',
     }}>
       <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
         style={{ width: '48px', height: '48px', borderRadius: '50%',
           border: '3px solid rgba(100,180,246,0.15)', borderTopColor: '#64b5f6' }} />
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: '600' }}>Locating you…</p>
+      <p style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Locating you…</p>
     </div>
   );
 
   return (
     <>
-      {/* Animated background — always on */}
-      <AtmosphericBg
-        weatherCode={weather?.current?.weather_code ?? 0}
-        isDay={weather?.current?.is_day ?? true}
-      />
+
       <CursorGlow accent={accent} />
 
       {/* Page scroll content ON TOP of canvas */}
@@ -631,14 +525,14 @@ export default function Home() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: accent,
                 boxShadow: `0 0 10px ${accent}`, animation: 'pulse 2s infinite' }} />
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontWeight: '600', fontSize: '0.85rem' }}>
+              <p style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.85rem' }}>
                 {searched?.name
                   ? `📍 ${searched.name}`
                   : active ? `📍 ${active.latitude?.toFixed(2)}°N, ${active.longitude?.toFixed(2)}°E`
                   : '📍 Locating...'}
               </p>
               <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
-              <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <FiClock size={11} /> <LiveClock timezone={searched?.timezone || weather?.timezone} />
               </p>
             </div>
@@ -650,8 +544,8 @@ export default function Home() {
                   onClick={() => { setSearched(null); setSelectedLocation(null); }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '8px 14px', borderRadius: '50px', border: '1px solid rgba(255,255,255,0.15)',
-                    background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)',
+                    padding: '8px 14px', borderRadius: '50px', border: '1px solid var(--border-card)',
+                    background: 'var(--bg-card)', color: 'var(--text-secondary)',
                     cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600', backdropFilter: 'blur(10px)',
                   }}>
                   <FiNavigation size={12} /> My Location
@@ -677,7 +571,7 @@ export default function Home() {
             style={{ maxWidth: '560px', marginBottom: '36px' }}>
             <div style={{
               borderRadius: '18px', position: 'relative', zIndex: 50,
-              background: 'rgba(255,255,255,0.07)',
+              background: 'var(--bg-card)',
               border: '1px solid rgba(255,255,255,0.13)',
               backdropFilter: 'blur(30px)',
               boxShadow: `0 0 60px ${accent}15`,
@@ -696,7 +590,7 @@ export default function Home() {
                 animate={{ opacity: 1, height: 'auto', scale: 1 }}
                 exit={{ opacity: 0, height: 0, scale: 0.95 }}
                 style={{ marginBottom: '32px', borderRadius: '24px', overflow: 'hidden',
-                  border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}
+                  border: '1px solid var(--border-card)', backdropFilter: 'blur(10px)' }}
               >
                 <WeatherGlobe
                   onLocationSelect={loc => { setSearched(loc); setSelectedLocation(loc); }}
@@ -713,15 +607,15 @@ export default function Home() {
               style={{
                 textAlign: 'center', padding: '5rem 2rem',
                 borderRadius: '28px',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px dashed rgba(255,255,255,0.15)',
+                background: 'var(--bg-card)',
+                border: '1px dashed var(--border-card)',
                 backdropFilter: 'blur(20px)',
               }}>
               <p style={{ fontSize: '4rem', marginBottom: '16px' }}>🌍</p>
-              <h2 style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.5rem', fontWeight: '800', marginBottom: '8px' }}>
+              <h2 style={{ color: 'var(--text-primary)', fontSize: '1.5rem', fontWeight: '800', marginBottom: '8px' }}>
                 Search any city above
               </h2>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.95rem' }}>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
                 Or enable location access to see live local weather.
               </p>
             </motion.div>
@@ -794,11 +688,11 @@ export default function Home() {
                       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
                         style={{
                           borderRadius: '24px', padding: '1.5rem',
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
+                          background: 'var(--bg-card)',
+                          border: '1px solid var(--border-card)',
                           backdropFilter: 'blur(30px)',
                         }}>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontWeight: '700', fontSize: '0.75rem',
+                        <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
                           textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>☀️ Sun Schedule</p>
 
                         {/* Sun arc visualization */}
@@ -833,7 +727,7 @@ export default function Home() {
                             <div key={label} style={{ padding: '12px', borderRadius: '14px',
                               background: `${color}12`, border: `1px solid ${color}25`, textAlign: 'center' }}>
                               <p style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{emoji}</p>
-                              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.65rem', fontWeight: '700',
+                              <p style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '700',
                                 textTransform: 'uppercase', marginBottom: '4px' }}>{label}</p>
                               <p style={{ color: color, fontWeight: '800', fontSize: '1rem' }}>{val}</p>
                             </div>
@@ -864,3 +758,4 @@ export default function Home() {
     </>
   );
 }
+

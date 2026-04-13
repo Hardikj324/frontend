@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useWeatherStore } from '../store/weatherStore';
 import { useAuthStore } from '../store/authStore';
 import LocationAutocomplete from '../components/Search/LocationAutocomplete';
+import { API_BASE_URL } from '../utils/constants';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = API_BASE_URL;
 
 // ─── Wind Particle Radar Canvas ───────────────────────────────
 function WindRadar({ windSpeed, windDirection, weatherCode, temperature }) {
@@ -331,7 +332,7 @@ export default function RadarPage() {
   const temp = cur?.temperature ?? 20;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(155deg, #02080f 0%, #040d18 50%, #060f20 100%)' }}>
+    <div style={{ minHeight: '100vh', background: 'transparent' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '80px 24px 60px' }}>
 
         {/* ── Header ── */}
@@ -344,7 +345,7 @@ export default function RadarPage() {
           }}>
             🌀 Wind Radar
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.95rem' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
             Real-time wind flow visualization · animated particle field
           </p>
         </motion.div>
@@ -353,8 +354,8 @@ export default function RadarPage() {
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           style={{ maxWidth: '500px', marginBottom: '40px',
             borderRadius: '18px', position: 'relative', zIndex: 50,
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(20px)' }}
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-card)', backdropFilter: 'blur(20px)' }}
         >
           <LocationAutocomplete
             placeholder="Search a city to view wind radar..."
@@ -381,18 +382,18 @@ export default function RadarPage() {
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}
               style={{
                 borderRadius: '28px', overflow: 'hidden',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-card)',
                 backdropFilter: 'blur(20px)', padding: '24px',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
-                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                     Wind Flow — {location?.name || 'Current Location'}
                   </p>
                   <p style={{ color: '#34d399', fontWeight: '900', fontSize: '1.5rem' }}>
-                    {Math.round(windSpeed)} <span style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', fontWeight: '600' }}>km/h</span>
+                    {Math.round(windSpeed)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600' }}>km/h</span>
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '99px', background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}>
@@ -414,8 +415,8 @@ export default function RadarPage() {
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
                 style={{
                   borderRadius: '24px', padding: '24px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-card)',
                   backdropFilter: 'blur(20px)',
                 }}
               >
@@ -435,8 +436,8 @@ export default function RadarPage() {
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}
                 style={{
                   borderRadius: '24px', padding: '24px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-card)',
                   backdropFilter: 'blur(20px)',
                 }}
               >
@@ -454,13 +455,13 @@ export default function RadarPage() {
                   ].map(({ icon, label, value }) => (
                     <div key={label} style={{
                       padding: '12px', borderRadius: '14px',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.07)',
+                      background: 'var(--bg-input)',
+                      border: '1px solid var(--border-input)',
                     }}>
-                      <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.62rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.62rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '3px' }}>
                         {icon} {label}
                       </p>
-                      <p style={{ color: '#fff', fontWeight: '900', fontSize: '1rem' }}>{value}</p>
+                      <p style={{ color: 'var(--text-primary)', fontWeight: '900', fontSize: '1rem' }}>{value}</p>
                     </div>
                   ))}
                 </div>
@@ -471,15 +472,15 @@ export default function RadarPage() {
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
                 style={{
                   borderRadius: '24px', padding: '24px',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'var(--bg-card)',
+                  border: '1px solid var(--border-card)',
                   backdropFilter: 'blur(20px)',
                 }}
               >
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px' }}>
                   🌤️ Current Condition
                 </p>
-                <p style={{ color: '#fff', fontWeight: '700', fontSize: '1.1rem', lineHeight: 1.5 }}>
+                <p style={{ color: 'var(--text-primary)', fontWeight: '700', fontSize: '1.1rem', lineHeight: 1.5 }}>
                   {cur.condition_description}
                 </p>
                 {windSpeed > 40 && (
@@ -504,10 +505,10 @@ export default function RadarPage() {
             style={{ textAlign: 'center', padding: '8rem 2rem' }}
           >
             <p style={{ fontSize: '4rem', marginBottom: '16px' }}>🌀</p>
-            <h2 style={{ color: 'rgba(255,255,255,0.7)', fontWeight: '800', fontSize: '1.5rem', marginBottom: '8px' }}>
+            <h2 style={{ color: 'var(--text-primary)', fontWeight: '800', fontSize: '1.5rem', marginBottom: '8px' }}>
               Search a city above
             </h2>
-            <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.95rem' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
               Or enable location access to see your local wind radar.
             </p>
           </motion.div>

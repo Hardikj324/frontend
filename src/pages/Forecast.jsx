@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useWeatherStore } from '../store/weatherStore';
+import { useDarkMode } from '../hooks/useDarkMode';
 import { useNavigate } from 'react-router-dom';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -33,12 +34,20 @@ const fullDayLabel = (date) => {
 };
 
 // Animated weather-condition background color
-const conditionColors = {
+const darkConditionColors = {
   clear: { from: '#1a1040', to: '#0f3460', accent: '#fbbf24' },
   cloudy: { from: '#1e293b', to: '#334155', accent: '#94a3b8' },
   rain: { from: '#0c1445', to: '#1e3a5f', accent: '#60a5fa' },
   storm: { from: '#0d0d1a', to: '#1a0a2e', accent: '#a855f7' },
   snow: { from: '#1e3a5f', to: '#0f2744', accent: '#bfdbfe' },
+};
+
+const lightConditionColors = {
+  clear: { from: '#e0f2fe', to: '#bae6fd', accent: '#f59e0b' },
+  cloudy: { from: '#f1f5f9', to: '#e2e8f0', accent: '#64748b' },
+  rain: { from: '#dbeafe', to: '#bfdbfe', accent: '#3b82f6' },
+  storm: { from: '#ede9fe', to: '#ddd6fe', accent: '#8b5cf6' },
+  snow: { from: '#eff6ff', to: '#dbeafe', accent: '#60a5fa' },
 };
 
 const getConditionKey = (code) => {
@@ -51,7 +60,7 @@ const getConditionKey = (code) => {
 };
 
 // Floating animated particle canvas
-function WeatherParticles({ conditionKey }) {
+function WeatherParticles({ conditionKey, palette }) {
   const canvasRef = useRef(null);
   const animRef = useRef(null);
 
@@ -85,8 +94,6 @@ function WeatherParticles({ conditionKey }) {
 
     buildParticles();
 
-    const palette = conditionColors[conditionKey] || conditionColors.clear;
-
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
       particles.forEach(p => {
@@ -98,7 +105,7 @@ function WeatherParticles({ conditionKey }) {
           ctx.lineTo(p.x + p.speedX * 2, p.y + 14);
           ctx.stroke();
         } else {
-          ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+          ctx.fillStyle = conditionKey === 'cloudy' ? `rgba(148, 163, 184, ${p.opacity})` : `rgba(255, 255, 255, ${p.opacity})`;
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fill();
         }
@@ -125,7 +132,7 @@ function TempRing({ value, max, color, size = 80 }) {
   const pct = Math.min(Math.max((value + 10) / (max + 10), 0), 1);
   return (
     <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={8} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border-input)" strokeWidth={8} />
       <motion.circle
         cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={8}
         strokeLinecap="round" strokeDasharray={circ}
@@ -148,7 +155,7 @@ function MetricBar({ label, value, max, color, icon: Icon }) {
         </span>
         <span style={{ color: color, fontSize: '0.82rem', fontWeight: '800' }}>{value}</span>
       </div>
-      <div style={{ height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+      <div style={{ height: '6px', borderRadius: '99px', background: 'var(--border-input)', overflow: 'hidden' }}>
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
@@ -164,8 +171,8 @@ function MetricBar({ label, value, max, color, icon: Icon }) {
 const ChartTip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: 'rgba(15,20,40,0.95)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '12px 16px', backdropFilter: 'blur(20px)' }}>
-      <p style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: '700', marginBottom: '8px' }}>{label}</p>
+    <div style={{ background: 'var(--bg-dropdown)', border: '1px solid var(--border-input)', borderRadius: '12px', padding: '12px 16px', backdropFilter: 'blur(20px)' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', fontWeight: '700', marginBottom: '8px' }}>{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ color: p.color, fontWeight: '700', fontSize: '0.85rem' }}>
           {p.name}: {Math.round(p.value)}{p.name.includes('Temp') ? '°C' : p.name.includes('Rain') ? '%' : ` km/h`}
@@ -187,6 +194,9 @@ const TABS = [
 
 export default function Forecast() {
   const navigate = useNavigate();
+  const { darkMode } = useDarkMode();
+  const conditionColors = darkMode ? darkConditionColors : lightConditionColors;
+  
   const weather = useWeatherStore(s => s.weather);
   const [tab, setTab] = useState('cinema');
   const [activeDay, setActiveDay] = useState(0);
@@ -267,7 +277,7 @@ export default function Forecast() {
                 padding: '8px 14px', borderRadius: '8px', border: 'none', cursor: 'pointer',
                 fontSize: '0.78rem', fontWeight: '700', transition: 'all 0.2s',
                 background: tab === t.id ? palette.accent : 'transparent',
-                color: tab === t.id ? '#000' : 'var(--text-secondary)',
+                color: tab === t.id ? (darkMode ? '#000' : '#fff') : 'var(--text-secondary)',
               }}>
               {t.label}
             </button>
@@ -294,8 +304,8 @@ export default function Forecast() {
               }}>
               <p style={{ fontSize: '0.7rem', fontWeight: '700', color: activeDay === i ? pal.accent : 'var(--text-muted)', marginBottom: '6px' }}>{dayLabel(d.date)}</p>
               <p style={{ fontSize: '1.6rem', lineHeight: 1, marginBottom: '6px' }}>{getWeatherIcon(d.weather_code, true)}</p>
-              <p style={{ fontSize: '0.85rem', fontWeight: '800', color: activeDay === i ? '#fff' : 'var(--text-primary)' }}>{Math.round(d.temperature_max)}°</p>
-              <p style={{ fontSize: '0.72rem', color: activeDay === i ? 'rgba(255,255,255,0.5)' : 'var(--text-muted)' }}>{Math.round(d.temperature_min)}°</p>
+              <p style={{ fontSize: '0.85rem', fontWeight: '800', color: activeDay === i ? 'var(--text-primary)' : 'var(--text-primary)' }}>{Math.round(d.temperature_max)}°</p>
+              <p style={{ fontSize: '0.72rem', color: activeDay === i ? 'var(--text-secondary)' : 'var(--text-muted)' }}>{Math.round(d.temperature_min)}°</p>
             </motion.button>
           );
         })}
@@ -314,7 +324,7 @@ export default function Forecast() {
               background: `linear-gradient(160deg, ${palette.from} 0%, ${palette.to} 100%)`,
               border: `1px solid ${palette.accent}30`
             }}>
-              <WeatherParticles conditionKey={conditionKey} />
+              <WeatherParticles conditionKey={conditionKey} palette={palette} />
 
               {/* Glow orb */}
               <div style={{
@@ -328,11 +338,11 @@ export default function Forecast() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <motion.p initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
-                      style={{ color: palette.accent, fontWeight: '700', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>
+                      style={{ color: palette.accent, fontWeight: '800', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '6px' }}>
                       {fullDayLabel(day.date)}
                     </motion.p>
                     <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}
-                      style={{ color: '#fff', fontSize: '1.1rem', fontWeight: '700', maxWidth: '260px', lineHeight: 1.4 }}>
+                      style={{ color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', maxWidth: '260px', lineHeight: 1.4 }}>
                       {day.condition_description}
                     </motion.h2>
                   </div>
@@ -348,10 +358,10 @@ export default function Forecast() {
                       <TempRing value={day.temperature_max} max={50} color="#fb923c" size={80} />
                       <div>
                         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
-                          style={{ color: '#fff', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1, letterSpacing: '-2px' }}>
+                          style={{ color: 'var(--text-primary)', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1, letterSpacing: '-2px' }}>
                           {Math.round(day.temperature_max)}°
                         </motion.p>
-                        <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.85rem' }}>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: '600' }}>
                           Feels like {Math.round(day.temperature_min + 2)}° · Low {Math.round(day.temperature_min)}°
                         </p>
                       </div>
@@ -367,8 +377,8 @@ export default function Forecast() {
                       <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 + i * 0.1 }}
                         style={{ textAlign: 'center' }}>
                         <Icon size={14} style={{ color, marginBottom: '4px' }} />
-                        <p style={{ color: '#fff', fontWeight: '800', fontSize: '1.1rem' }}>{val}</p>
-                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem' }}>{label}</p>
+                        <p style={{ color: 'var(--text-primary)', fontWeight: '800', fontSize: '1.1rem' }}>{val}</p>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: '600' }}>{label}</p>
                       </motion.div>
                     ))}
                   </div>
@@ -379,16 +389,16 @@ export default function Forecast() {
             {/* Metric Cards Row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px,1fr))', gap: '12px', marginBottom: '1.5rem' }}>
               {[
-                { icon: FiSunrise, label: 'Sunrise', val: day.sunrise ? formatTime(day.sunrise) : '--', color: '#fbbf24', bg: 'rgba(251,191,36,0.08)' },
-                { icon: FiSunset, label: 'Sunset', val: day.sunset ? formatTime(day.sunset) : '--', color: '#f87171', bg: 'rgba(248,113,113,0.08)' },
-                { icon: FiWind, label: 'Max Wind', val: `${Math.round(day.wind_speed_max)} km/h`, color: '#a3e635', bg: 'rgba(163,230,53,0.08)' },
-                { icon: FiDroplet, label: 'Rain Prob', val: `${Math.round(day.precipitation_probability_max)}%`, color: '#60a5fa', bg: 'rgba(96,165,250,0.08)' },
-                { icon: FiSun, label: 'UV Index', val: `${formatUVIndex(day.uv_index_max)}`, color: '#fb923c', bg: 'rgba(251,146,60,0.08)' },
-                { icon: FiNavigation, label: 'Wind Dir', val: day.wind_direction_dominant != null ? `${day.wind_direction_dominant}°` : '--', color: '#c084fc', bg: 'rgba(192,132,252,0.08)' },
-              ].map(({ icon: Icon, label, val, color, bg }, i) => (
+                { icon: FiSunrise, label: 'Sunrise', val: day.sunrise ? formatTime(day.sunrise) : '--', color: '#fbbf24' },
+                { icon: FiSunset, label: 'Sunset', val: day.sunset ? formatTime(day.sunset) : '--', color: '#f87171' },
+                { icon: FiWind, label: 'Max Wind', val: `${Math.round(day.wind_speed_max)} km/h`, color: '#a3e635' },
+                { icon: FiDroplet, label: 'Rain Prob', val: `${Math.round(day.precipitation_probability_max)}%`, color: '#60a5fa' },
+                { icon: FiSun, label: 'UV Index', val: `${formatUVIndex(day.uv_index_max)}`, color: '#fb923c' },
+                { icon: FiNavigation, label: 'Wind Dir', val: day.wind_direction_dominant != null ? `${day.wind_direction_dominant}°` : '--', color: '#c084fc' },
+              ].map(({ icon: Icon, label, val, color }, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}
                   whileHover={{ y: -4, boxShadow: `0 8px 30px ${color}20` }}
-                  style={{ background: bg, borderRadius: '16px', padding: '1.2rem', border: `1px solid ${color}25`, cursor: 'default', transition: 'box-shadow 0.2s' }}>
+                  style={{ background: 'var(--bg-card)', borderRadius: '16px', padding: '1.2rem', border: `1px solid var(--border-card)`, cursor: 'default', transition: 'box-shadow 0.2s' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                     <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Icon size={14} style={{ color }} />
@@ -417,7 +427,7 @@ export default function Forecast() {
                       </span>
                       <span style={{ color, fontSize: '0.82rem', fontWeight: '800' }}>{value}</span>
                     </div>
-                    <div style={{ height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                    <div style={{ height: '6px', borderRadius: '99px', background: 'var(--border-input)', overflow: 'hidden' }}>
                       <motion.div initial={{ width: 0 }}
                         animate={{ width: `${Math.min((rawValue / max) * 100, 100)}%` }}
                         transition={{ duration: 1.2, ease: 'easeOut' }}
@@ -561,14 +571,14 @@ export default function Forecast() {
               <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.9rem', marginBottom: '1.2rem' }}>Week Comparison</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {dnaData.map((d, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
-                    onClick={() => setActiveDay(i)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', cursor: 'pointer',
-                      background: activeDay === i ? `${palette.accent}15` : 'rgba(255,255,255,0.03)',
-                      border: activeDay === i ? `1px solid ${palette.accent}40` : '1px solid transparent',
-                      transition: 'all 0.2s'
-                    }}>
+                    <motion.div key={i} initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
+                      onClick={() => setActiveDay(i)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px', cursor: 'pointer',
+                        background: activeDay === i ? `${palette.accent}15` : 'var(--bg-input)',
+                        border: activeDay === i ? `1px solid ${palette.accent}40` : '1px solid transparent',
+                        transition: 'all 0.2s'
+                      }}>
                     <span style={{ fontSize: '1.3rem', width: '28px', textAlign: 'center' }}>{getWeatherIcon(daily[i]?.weather_code, true)}</span>
                     <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: '700', width: '70px', flexShrink: 0 }}>{d.day}</span>
                     {[
@@ -578,7 +588,7 @@ export default function Forecast() {
                       { label: 'UV', val: d.UV, color: '#fbbf24' },
                     ].map(m => (
                       <div key={m.label} style={{ flex: 1 }}>
-                        <div style={{ height: '5px', borderRadius: '99px', background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+                        <div style={{ height: '5px', borderRadius: '99px', background: 'var(--border-input)', overflow: 'hidden' }}>
                           <motion.div
                             animate={{ width: `${m.val}%` }}
                             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -632,15 +642,15 @@ export default function Forecast() {
                   <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                     style={{
                       flex: '0 0 auto', width: '90px', borderRadius: '16px', padding: '14px 10px', textAlign: 'center',
-                      background: `linear-gradient(180deg, ${pal.from}cc, ${pal.to}cc)`,
-                      border: `1px solid ${pal.accent}30`, backdropFilter: 'blur(10px)'
+                      background: darkMode ? `linear-gradient(180deg, ${pal.from}cc, ${pal.to}cc)` : `linear-gradient(180deg, ${pal.from}, ${pal.to})`,
+                      border: `1px solid ${pal.accent}30`
                     }}>
                     <p style={{ color: pal.accent, fontSize: '0.68rem', fontWeight: '700', marginBottom: '8px' }}>
                       {h.time ? format(parseISO(h.time), 'HH:mm') : '--'}
                     </p>
                     <p style={{ fontSize: '1.5rem', marginBottom: '8px' }}>{getWeatherIcon(h.weather_code, true)}</p>
-                    <p style={{ color: '#fff', fontWeight: '800', fontSize: '0.95rem', marginBottom: '4px' }}>{Math.round(tp)}°</p>
-                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem' }}>
+                    <p style={{ color: 'var(--text-primary)', fontWeight: '800', fontSize: '0.95rem', marginBottom: '4px' }}>{Math.round(tp)}°</p>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.65rem' }}>
                       {h.precipitation_probability != null ? `💧${Math.round(h.precipitation_probability)}%` : ''}
                     </p>
                   </motion.div>

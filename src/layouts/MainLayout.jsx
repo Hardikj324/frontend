@@ -26,7 +26,7 @@ export default function MainLayout() {
         {/* Global Toast Notification Container */}
         <Toaster position="top-right" reverseOrder={false} />
 
-        <main style={{ flex:1 }} className="page-enter">
+        <main style={{ flex:1 }} className="page-enter app-shell">
           <Outlet />
         </main>
       </div>

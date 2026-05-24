@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { saveLocations, getUserLocations } from '../../services/locationsAPI';
-import { FiSave, FiRefreshCw, FiTrash2 } from 'react-icons/fi';
+import { FiSave, FiRefreshCw, FiTrash2, FiStar } from 'react-icons/fi';
 import LoadingSpinner from '../Common/LoadingSpinner';
 
 export default function SavedLocations() {
@@ -44,41 +44,49 @@ export default function SavedLocations() {
   };
 
   return (
-    <motion.div className="card" initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }} style={{ padding:'1.75rem' }}>
-      <p className="card-title">⭐ Saved Locations</p>
+    <motion.div className="card" initial={{ opacity:0, y:18 }} animate={{ opacity:1, y:0 }} style={{ padding:'1.75rem', marginBottom: '1.5rem', background: 'var(--bg-card)', boxShadow: 'var(--shadow-sm)' }}>
+      <p style={{ fontSize: '1.2rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem', color: 'var(--text-primary)' }}>
+        <FiStar style={{ color: 'var(--accent)' }}/> Favorite Locations
+      </p>
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:'0.9rem', marginBottom:'1.1rem' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(240px, 1fr))', gap:'1.2rem', marginBottom:'1.5rem' }}>
         {['slot1','slot2','slot3','slot4'].map((s, i) => (
-          <div key={s}>
-            <label style={{ color:'var(--text-label)', fontSize:'0.68rem', fontWeight:'800', textTransform:'uppercase', letterSpacing:'0.07em', display:'block', marginBottom:'6px' }}>Slot {i+1}</label>
-            <input type="text" name={s} value={slots[s]} placeholder={`City name, e.g. Delhi`}
+          <div key={s} style={{ position: 'relative' }}>
+            <label style={{ 
+              position: 'absolute', top: '-8px', left: '12px', background: 'var(--bg-card)', 
+              padding: '0 6px', color:'var(--text-label)', fontSize:'0.7rem', fontWeight:'800', 
+              textTransform:'uppercase', letterSpacing:'0.05em', zIndex: 2
+            }}>
+              Slot {i+1}
+            </label>
+            <input type="text" name={s} value={slots[s]} placeholder={`e.g. London, UK`}
               onChange={e => setSlots({...slots, [s]:e.target.value})}
-              style={inputStyle} disabled={loading}
-              onFocus={e=>e.target.style.borderColor='var(--border-input-focus)'}
-              onBlur={e=>e.target.style.borderColor='var(--border-input)'}
+              style={{ ...inputStyle, padding: '14px 16px' }} disabled={loading}
+              onFocus={e=> { e.target.style.borderColor='var(--accent)'; e.target.style.boxShadow='var(--shadow-glow)'; }}
+              onBlur={e=> { e.target.style.borderColor='var(--border-input)'; e.target.style.boxShadow='none'; }}
             />
           </div>
         ))}
       </div>
 
-      <div style={{ display:'flex', gap:'8px' }}>
-        <button onClick={save} disabled={loading} className="btn btn-primary" style={{ flex:1, justifyContent:'center' }}>
-          <FiSave size={15}/> {loading ? 'Saving…' : 'Save'}
+      <div style={{ display:'flex', gap:'10px' }}>
+        <button onClick={save} disabled={loading} className="btn btn-primary" style={{ flex:1, justifyContent:'center', padding: '12px' }}>
+          <FiSave size={18}/> {loading ? 'Saving…' : 'Save Changes'}
         </button>
-        <button onClick={() => setSlots({slot1:'',slot2:'',slot3:'',slot4:''})} disabled={loading} className="btn btn-danger">
-          <FiTrash2 size={15}/>
+        <button onClick={() => setSlots({slot1:'',slot2:'',slot3:'',slot4:''})} disabled={loading} className="btn btn-danger" style={{ padding: '12px 18px' }} title="Clear all">
+          <FiTrash2 size={18}/>
         </button>
-        <button onClick={fetchLocations} disabled={loading||fetching} className="btn btn-ghost">
-          <FiRefreshCw size={15} className={fetching?'animate-spin':''} />
+        <button onClick={fetchLocations} disabled={loading||fetching} className="btn btn-ghost" style={{ padding: '12px 18px' }} title="Reload from server">
+          <FiRefreshCw size={18} className={fetching?'animate-spin':''} />
         </button>
       </div>
 
       {msg && (
-        <motion.div initial={{ opacity:0, y:-6 }} animate={{ opacity:1, y:0 }}
-          style={{ marginTop:'10px', padding:'10px 14px', borderRadius:'var(--r-sm)', textAlign:'center', fontWeight:'700', fontSize:'0.875rem',
+        <motion.div initial={{ opacity:0, y:-6, scale: 0.95 }} animate={{ opacity:1, y:0, scale: 1 }}
+          style={{ marginTop:'15px', padding:'12px 16px', borderRadius:'var(--r-md)', textAlign:'center', fontWeight:'700', fontSize:'0.9rem',
             background: msgOk ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)',
             border:`1px solid ${msgOk ? 'rgba(52,211,153,0.3)':'rgba(239,68,68,0.25)'}`,
-            color: msgOk ? 'var(--green)' : 'var(--red)' }}>
+            color: msgOk ? 'var(--green)' : 'var(--red)', backdropFilter: 'blur(10px)' }}>
           {msgOk ? '✅' : '❌'} {msg}
         </motion.div>
       )}

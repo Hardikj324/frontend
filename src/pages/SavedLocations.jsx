@@ -33,78 +33,78 @@ function LocationCard({ location, index, onEdit, onDelete, onClick }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ delay: index * 0.07 }}
+      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }}
+      transition={{ delay: index * 0.05, type: 'spring', bounce: 0.3 }}
+      whileHover={{ y: -5, scale: 1.02 }}
       style={{ position: 'relative', cursor: 'pointer' }}
       onClick={onClick}>
 
       {/* Card */}
-      <div className="card card-hover" style={{ padding: '1.5rem', height: '100%' }}>
+      <div className="card" style={{ padding: '1.5rem', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', boxShadow: 'var(--shadow-sm)' }}>
 
         {/* Action buttons (top-right) */}
         <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '6px', zIndex: 2 }}
           onClick={e => e.stopPropagation()}>
-          <button onClick={(e) => { e.stopPropagation(); onEdit(index); }} title="Edit city"
-            style={{ width: '30px', height: '30px', borderRadius: 'var(--r-sm)', border: '1px solid var(--border-input)', background: 'var(--bg-input)', color: 'var(--accent)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-            <FiEdit2 size={13} />
-          </button>
-          <button onClick={handleDelete} disabled={deleting} title="Remove"
-            style={{ width: '30px', height: '30px', borderRadius: 'var(--r-sm)', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.1)', color: 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
-            <FiX size={13} />
-          </button>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={(e) => { e.stopPropagation(); onEdit(index); }} title="Edit city"
+            style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid var(--border-input)', background: 'var(--bg-card)', color: 'var(--accent)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <FiEdit2 size={14} />
+          </motion.button>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={handleDelete} disabled={deleting} title="Remove"
+            style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.1)', color: 'var(--red)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+            <FiX size={14} />
+          </motion.button>
         </div>
 
-        {/* Location name */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '1rem', paddingRight: '72px' }}>
-          <FiMapPin size={14} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-          <p style={{ fontWeight: '800', fontSize: '1.05rem', color: 'var(--accent)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{location.name}</p>
-        </div>
-
-        {/* Weather content */}
-        {c ? (
-          <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
-              <div>
-                <p style={{ fontSize: '2.8rem', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-1px' }}>
-                  {formatTemperature(c.temperature)}
-                </p>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: '500', marginTop: '4px' }}>
-                  {c.condition_description}
-                </p>
-              </div>
-              <span style={{ fontSize: '3rem', lineHeight: 1, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.2))' }}>
-                {getWeatherIcon(c.weather_code, c.is_day)}
-              </span>
+        <div>
+          {/* Location name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem', paddingRight: '72px' }}>
+            <div style={{ padding: '6px', background: 'var(--accent-subtle)', borderRadius: '50%' }}>
+              <FiMapPin size={16} style={{ color: 'var(--accent)' }} />
             </div>
-
-            <div style={{ display: 'flex', gap: '8px', paddingTop: '1rem', borderTop: '1px solid var(--border-card)' }}>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', background: 'var(--accent-subtle)', padding: '7px', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
-                <FiDroplet size={12} />
-                <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{c.humidity}%</span>
-              </div>
-              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', background: 'var(--accent-subtle)', padding: '7px', borderRadius: 'var(--r-sm)', color: 'var(--accent)' }}>
-                <FiWind size={12} />
-                <span style={{ fontSize: '0.8rem', fontWeight: '700' }}>{Math.round(c.wind_speed)} km/h</span>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            No weather data
+            <p style={{ fontWeight: '900', fontSize: '1.15rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.01em' }}>{location.name}</p>
           </div>
-        )}
+
+          {/* Weather content */}
+          {c ? (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div>
+                  <p style={{ fontSize: '3.2rem', fontWeight: '900', color: 'var(--text-primary)', lineHeight: 1, letterSpacing: '-2px', background: 'linear-gradient(135deg, var(--text-primary), var(--accent))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    {formatTemperature(c.temperature)}
+                  </p>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', fontWeight: '600', marginTop: '8px' }}>
+                    {c.condition_description}
+                  </p>
+                </div>
+                <motion.span initial={{ scale: 0.8 }} animate={{ scale: 1 }} transition={{ type: 'spring' }} style={{ fontSize: '3.5rem', lineHeight: 1, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))' }}>
+                  {getWeatherIcon(c.weather_code, c.is_day)}
+                </motion.span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', paddingTop: '1.25rem', borderTop: '1px solid var(--border-card)' }}>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-input)', padding: '10px', borderRadius: '12px', color: 'var(--text-secondary)' }}>
+                  <FiDroplet size={14} style={{ color: 'var(--blue)' }}/>
+                  <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{c.humidity}%</span>
+                </div>
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--bg-input)', padding: '10px', borderRadius: '12px', color: 'var(--text-secondary)' }}>
+                  <FiWind size={14} style={{ color: 'gray' }}/>
+                  <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>{Math.round(c.wind_speed)} km/h</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: '600' }}>
+              Weather data unavailable
+            </div>
+          )}
+        </div>
 
         {/* Delete error */}
         {deleteError && (
-          <p style={{ color: 'var(--red)', fontSize: '0.75rem', textAlign: 'center', marginTop: '8px', fontWeight: '600' }}>
+          <p style={{ color: 'var(--red)', fontSize: '0.8rem', textAlign: 'center', marginTop: '12px', fontWeight: '700' }}>
             ❌ {deleteError}
           </p>
         )}
-
-        {/* Click hint */}
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.68rem', textAlign: 'center', marginTop: '10px', opacity: 0.6 }}>
-          Click card to view full weather →
-        </p>
       </div>
     </motion.div>
   );

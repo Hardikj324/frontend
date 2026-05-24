@@ -238,7 +238,7 @@ function CompassRose({ direction }) {
         </motion.div>
       </div>
       <span style={{ color: '#64b5f6', fontWeight: '900', fontSize: '1rem' }}>{dirs[idx]}</span>
-      <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>{direction || 0}°</span>
+      <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>{direction || 0}°</span>
     </div>
   );
 }
@@ -269,7 +269,7 @@ function BeaufortScale({ windSpeed }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-        <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Beaufort Scale
         </span>
         <span style={{ color, fontWeight: '900', fontSize: '0.85rem' }}>
@@ -284,7 +284,7 @@ function BeaufortScale({ windSpeed }) {
           style={{ height: '100%', borderRadius: '99px', background: `linear-gradient(90deg, #34d399, ${color})` }}
         />
       </div>
-      <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.72rem' }}>{scale.desc}</p>
+      <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem' }}>{scale.desc}</p>
     </div>
   );
 }
@@ -333,7 +333,7 @@ export default function RadarPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'transparent' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '80px 24px 60px' }}>
+      <div style={{ padding: '80px 24px 120px' }}>
 
         {/* ── Header ── */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '36px' }}>
@@ -393,7 +393,7 @@ export default function RadarPage() {
                     Wind Flow — {location?.name || 'Current Location'}
                   </p>
                   <p style={{ color: '#34d399', fontWeight: '900', fontSize: '1.5rem' }}>
-                    {Math.round(windSpeed)} <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '600' }}>km/h</span>
+                    {Math.round(windSpeed)} <span style={{ fontSize: '0.9rem', color: 'var(--text-label)', fontWeight: '600' }}>km/h</span>
                   </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', borderRadius: '99px', background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)' }}>
@@ -420,7 +420,7 @@ export default function RadarPage() {
                   backdropFilter: 'blur(20px)',
                 }}
               >
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '20px' }}>
+                <p style={{ color: 'var(--text-label)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '20px' }}>
                   🧭 Wind Direction
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
@@ -441,7 +441,7 @@ export default function RadarPage() {
                   backdropFilter: 'blur(20px)',
                 }}
               >
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>
+                <p style={{ color: 'var(--text-label)', fontSize: '0.7rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>
                   🌡️ Atmospheric Conditions
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>

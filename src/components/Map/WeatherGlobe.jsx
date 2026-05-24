@@ -144,7 +144,7 @@ export default function WeatherGlobe({ onLocationSelect, searchedLocation, userL
       color: #5ab5ff;
       font-size: 11px;
       font-weight: 800;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       letter-spacing: 0.02em;
       white-space: nowrap;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);

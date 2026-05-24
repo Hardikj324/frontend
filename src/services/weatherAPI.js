@@ -2,6 +2,7 @@ import apiClient from './apiClient';
 
 export const getWeatherByCoordinates = async (latitude, longitude) => {
   try {
+    console.log(`[WeatherAPI] Fetching live location weather for: ${latitude}, ${longitude}`);
     const response = await apiClient.post('/weather/current-location', {
       current_latitude: latitude,
       current_longitude: longitude,

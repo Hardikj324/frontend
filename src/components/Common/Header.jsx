@@ -90,8 +90,9 @@ export default function Header() {
 
           {/* Desktop nav — scrollable */}
           <nav className="desktop-nav" style={{
-            alignItems: 'center', gap: '2px',
-            overflowX: 'auto', scrollbarWidth: 'none', flex: 1, justifyContent: 'center',
+            alignItems: 'center', gap: '8px',
+            overflowX: 'auto', scrollbarWidth: 'none', flex: 1,
+            padding: '0 10px',
           }}>
             {navItems.map(({ path, icon: Icon, label, color, badge }) => {
               const isActive = loc.pathname === path;
@@ -225,7 +226,7 @@ export default function Header() {
       {/* ── Mobile bottom nav ── */}
       <nav className="mobile-nav">
         <div className="mobile-nav-inner">
-          {navItems.slice(0, 7).map(({ path, icon: Icon, label, color }) => {
+          {navItems.map(({ path, icon: Icon, label, color }) => {
             const isActive = loc.pathname === path;
             return (
               <motion.button

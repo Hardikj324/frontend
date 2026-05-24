@@ -8,6 +8,7 @@ import { useWeatherStore } from '../store/weatherStore';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import LocationAutocomplete from '../components/Search/LocationAutocomplete';
 import WeatherGlobe from '../components/Map/WeatherGlobe';
+import SkyDial from '../components/Map/SkyDial';
 import {
   FiMapPin, FiNavigation, FiWind, FiDroplet, FiSun,
   FiEye, FiThermometer, FiActivity, FiClock
@@ -142,10 +143,12 @@ function HeroTemp({ current, locationName, updated }) {
       {/* Warning banner */}
       {warn.level !== 'normal' && (
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px',
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '16px',
             padding: '8px 16px', borderRadius: '50px',
             background: `${warn.color}20`, border: `1px solid ${warn.color}50`,
-            backdropFilter: 'blur(10px)' }}>
+            backdropFilter: 'blur(10px)'
+          }}>
           <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: warn.color, animation: 'pulse 2s infinite' }} />
           <span style={{ color: warn.color, fontWeight: '700', fontSize: '0.85rem' }}>{warn.message}</span>
         </motion.div>
@@ -171,14 +174,18 @@ function MetricPill({ icon: Icon, label, value, color, delay = 0 }) {
         cursor: 'default',
       }}
     >
-      <div style={{ width: '36px', height: '36px', borderRadius: '10px',
+      <div style={{
+        width: '36px', height: '36px', borderRadius: '10px',
         background: `${color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0, border: `1px solid ${color}30` }}>
+        flexShrink: 0, border: `1px solid ${color}30`
+      }}>
         <Icon size={16} style={{ color }} />
       </div>
       <div>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: '700',
-          textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>{label}</p>
+        <p style={{
+          color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: '700',
+          textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px'
+        }}>{label}</p>
         <p style={{ color: 'var(--text-primary)', fontWeight: '800', fontSize: '0.9rem' }}>{value}</p>
       </div>
     </motion.div>
@@ -192,7 +199,7 @@ function Sparkline({ data, color }) {
       <AreaChart data={data} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id={`spark_${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%"  stopColor={color} stopOpacity={0.4} />
+            <stop offset="5%" stopColor={color} stopOpacity={0.4} />
             <stop offset="95%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
@@ -201,8 +208,10 @@ function Sparkline({ data, color }) {
         <Tooltip
           content={({ active, payload }) =>
             active && payload?.length ? (
-              <div style={{ background: 'rgba(0,0,0,0.8)', padding: '6px 10px', borderRadius: '8px',
-                fontSize: '0.75rem', color }}>
+              <div style={{
+                background: 'rgba(0,0,0,0.8)', padding: '6px 10px', borderRadius: '8px',
+                fontSize: '0.75rem', color
+              }}>
                 {Math.round(payload[0].value)}°
               </div>
             ) : null
@@ -231,8 +240,10 @@ function HourlyTimeline({ hourly = [] }) {
     >
       {/* Header */}
       <div style={{ padding: '1.25rem 1.5rem 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
-          textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <p style={{
+          color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
+          textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: '6px'
+        }}>
           <FiClock size={12} /> Next 12 Hours
         </p>
       </div>
@@ -257,8 +268,10 @@ function HourlyTimeline({ hourly = [] }) {
                 border: isNow ? '1px solid rgba(100,181,246,0.4)' : '1px solid rgba(255,255,255,0.06)',
               }}
             >
-              <p style={{ color: isNow ? '#64b5f6' : 'rgba(255,255,255,0.35)',
-                fontSize: '0.65rem', fontWeight: '700', marginBottom: '6px' }}>
+              <p style={{
+                color: isNow ? '#64b5f6' : 'rgba(255,255,255,0.35)',
+                fontSize: '0.65rem', fontWeight: '700', marginBottom: '6px'
+              }}>
                 {isNow ? 'Now' : h.time ? format(parseISO(h.time), 'HH:mm') : '--'}
               </p>
               <p style={{ fontSize: '1.3rem', marginBottom: '6px' }}>{getWeatherIcon(h.weather_code, h.is_day)}</p>
@@ -274,84 +287,22 @@ function HourlyTimeline({ hourly = [] }) {
   );
 }
 
-// ─── 7-DAY STRIP ─────────────────────────────────────────────
-function WeekStrip({ daily = [] }) {
-  if (!daily?.length) return null;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-      style={{
-        borderRadius: '24px',
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-card)',
-        backdropFilter: 'blur(30px)',
-        padding: '1.25rem 1.5rem',
-      }}
-    >
-      <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
-        textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>
-        📅 7-Day Outlook
-      </p>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {daily.slice(0, 7).map((d, i) => {
-          let dayStr = i === 0 ? 'Today'
-            : i === 1 ? 'Tomorrow'
-            : d.date ? format(parseISO(d.date), 'EEEE') : '---';
-          const rainPct = d.precipitation_probability_max ?? 0;
-          const maxT = Math.round(d.temperature_max);
-          const minT = Math.round(d.temperature_min);
-          const range = 40;
-          const barLeft  = ((minT + 10) / range) * 100;
-          const barWidth = ((maxT - minT) / range) * 100;
 
-          return (
-            <motion.div key={i}
-              initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 + i * 0.05 }}
-              whileHover={{ background: 'rgba(255,255,255,0.08)' }}
-              style={{ display: 'grid', alignItems: 'center', gridTemplateColumns: '90px 36px 36px 1fr 70px',
-                gap: '10px', padding: '10px 12px', borderRadius: '12px',
-                transition: 'background 0.2s' }}
-            >
-              <span style={{ color: i === 0 ? '#64b5f6' : 'rgba(255,255,255,0.75)',
-                fontWeight: i === 0 ? '800' : '500', fontSize: '0.85rem' }}>{dayStr}</span>
-              <span style={{ fontSize: '1.3rem', textAlign: 'center' }}>{getWeatherIcon(d.weather_code, true)}</span>
-              <span style={{ color: '#60a5fa', fontSize: '0.72rem', fontWeight: '600', textAlign: 'center' }}>
-                💧{Math.round(rainPct)}%
-              </span>
-              {/* Temp range bar */}
-              <div style={{ position: 'relative', height: '6px', borderRadius: '99px', background: 'rgba(255,255,255,0.08)' }}>
-                <div style={{
-                  position: 'absolute', top: 0, height: '100%', borderRadius: '99px',
-                  left: `${Math.max(0, barLeft)}%`, width: `${Math.max(5, Math.min(barWidth, 100 - barLeft))}%`,
-                  background: 'linear-gradient(90deg, #60a5fa, #fb923c)'
-                }} />
-              </div>
-              <div style={{ textAlign: 'right', display: 'flex', gap: '6px', justifyContent: 'flex-end', alignItems: 'baseline' }}>
-                <span style={{ color: '#fb923c', fontWeight: '800', fontSize: '0.88rem' }}>{maxT}°</span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>{minT}°</span>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </motion.div>
-  );
-}
 
 // ─── AQI PANEL ───────────────────────────────────────────────
 function AQIPanel({ airQuality }) {
   if (!airQuality?.aqi_pm25) return null;
-  const aqi   = airQuality.aqi_pm25;
+  const aqi = airQuality.aqi_pm25;
   const level = getAQILevel(aqi);
-  const rec   = getHealthRecommendation(aqi);
-  const pct   = Math.min((aqi / 300) * 100, 100);
-  const circ  = 2 * Math.PI * 32;
+  const rec = getHealthRecommendation(aqi);
+  const pct = Math.min((aqi / 300) * 100, 100);
+  const circ = 2 * Math.PI * 32;
 
   const pollutants = [
     { l: 'PM2.5', v: airQuality.pm25, u: 'µg/m³' },
-    { l: 'PM10',  v: airQuality.pm10,  u: 'µg/m³' },
-    { l: 'NO₂',   v: airQuality.nitrogen_dioxide, u: 'ppb' },
-    { l: 'O₃',    v: airQuality.ozone, u: 'ppb' },
+    { l: 'PM10', v: airQuality.pm10, u: 'µg/m³' },
+    { l: 'NO₂', v: airQuality.nitrogen_dioxide, u: 'ppb' },
+    { l: 'O₃', v: airQuality.ozone, u: 'ppb' },
   ].filter(p => p.v != null);
 
   return (
@@ -365,8 +316,10 @@ function AQIPanel({ airQuality }) {
         padding: '1.5rem',
       }}
     >
-      <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
-        textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>
+      <p style={{
+        color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
+        textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem'
+      }}>
         💨 Air Quality
       </p>
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
@@ -439,8 +392,10 @@ function InsightChip({ weather }) {
     >
       <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>📖</span>
       <div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '800',
-          textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>
+        <p style={{
+          color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '800',
+          textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px'
+        }}>
           Sky Insight
         </p>
         <p style={{ color: 'var(--text-primary)', fontSize: '0.9rem', lineHeight: 1.6 }}>{story}</p>
@@ -457,11 +412,11 @@ export default function Home() {
   const [searchParams] = useSearchParams();
   const { location: geoLoc, error: geoError, loading: geoLoading } = useGeolocation();
   const setSelectedLocation = useWeatherStore(s => s.setSelectedLocation);
-  const formattedUpdate     = useWeatherStore(s => s.getFormattedLastUpdated());
+  const formattedUpdate = useWeatherStore(s => s.getFormattedLastUpdated());
 
   const urlCity = searchParams.get('city');
-  const urlLat  = parseFloat(searchParams.get('lat'));
-  const urlLng  = parseFloat(searchParams.get('lng'));
+  const urlLat = parseFloat(searchParams.get('lat'));
+  const urlLng = parseFloat(searchParams.get('lng'));
 
   const [searched, setSearched] = useState(
     urlCity && urlLat && urlLng ? { name: urlCity, latitude: urlLat, longitude: urlLng } : null
@@ -498,8 +453,10 @@ export default function Home() {
       background: 'transparent',
     }}>
       <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-        style={{ width: '48px', height: '48px', borderRadius: '50%',
-          border: '3px solid rgba(100,180,246,0.15)', borderTopColor: '#64b5f6' }} />
+        style={{
+          width: '48px', height: '48px', borderRadius: '50%',
+          border: '3px solid rgba(100,180,246,0.15)', borderTopColor: '#64b5f6'
+        }} />
       <p style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>Locating you…</p>
     </div>
   );
@@ -511,7 +468,7 @@ export default function Home() {
 
       {/* Page scroll content ON TOP of canvas */}
       <div style={{ position: 'relative', zIndex: 2, minHeight: '100vh' }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 24px 40px', paddingTop: '80px' }}>
+        <div style={{ padding: '0 24px 120px', paddingTop: '80px' }}>
 
           {/* ── TOP STATUS BAR ── */}
           <motion.div
@@ -523,13 +480,15 @@ export default function Home() {
           >
             {/* Location + Clock */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: accent,
-                boxShadow: `0 0 10px ${accent}`, animation: 'pulse 2s infinite' }} />
+              <div style={{
+                width: '8px', height: '8px', borderRadius: '50%', background: accent,
+                boxShadow: `0 0 10px ${accent}`, animation: 'pulse 2s infinite'
+              }} />
               <p style={{ color: 'var(--text-secondary)', fontWeight: '600', fontSize: '0.85rem' }}>
                 {searched?.name
                   ? `📍 ${searched.name}`
                   : active ? `📍 ${active.latitude?.toFixed(2)}°N, ${active.longitude?.toFixed(2)}°E`
-                  : '📍 Locating...'}
+                    : '📍 Locating...'}
               </p>
               <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -589,8 +548,10 @@ export default function Home() {
                 initial={{ opacity: 0, height: 0, scale: 0.95 }}
                 animate={{ opacity: 1, height: 'auto', scale: 1 }}
                 exit={{ opacity: 0, height: 0, scale: 0.95 }}
-                style={{ marginBottom: '32px', borderRadius: '24px', overflow: 'hidden',
-                  border: '1px solid var(--border-card)', backdropFilter: 'blur(10px)' }}
+                style={{
+                  marginBottom: '32px', borderRadius: '24px', overflow: 'hidden',
+                  border: '1px solid var(--border-card)', backdropFilter: 'blur(10px)'
+                }}
               >
                 <WeatherGlobe
                   onLocationSelect={loc => { setSearched(loc); setSelectedLocation(loc); }}
@@ -651,12 +612,12 @@ export default function Home() {
                   }}
                 >
                   {[
-                    { icon: FiDroplet, label: 'Humidity',   value: `${Math.round(weather.current.humidity)}%`,                    color: '#60a5fa' },
-                    { icon: FiWind,    label: 'Wind',        value: `${Math.round(weather.current.wind_speed)} km/h`,              color: '#a3e635' },
-                    { icon: FiThermometer, label: 'Feels Like', value: `${Math.round(weather.current.feels_like)}°C`,             color: '#fb923c' },
-                    { icon: FiSun,     label: 'UV Index',    value: String(formatUVIndex(weather.current.uv_index)),               color: '#fbbf24' },
-                    { icon: FiEye,     label: 'Visibility',  value: `${(weather.current.visibility/1000).toFixed(1)} km`,          color: '#c084fc' },
-                    { icon: FiActivity,label: 'Pressure',    value: `${Math.round(weather.current.pressure)} hPa`,                color: '#f472b6' },
+                    { icon: FiDroplet, label: 'Humidity', value: `${Math.round(weather.current.humidity)}%`, color: '#60a5fa' },
+                    { icon: FiWind, label: 'Wind', value: `${Math.round(weather.current.wind_speed)} km/h`, color: '#a3e635' },
+                    { icon: FiThermometer, label: 'Feels Like', value: `${Math.round(weather.current.feels_like)}°C`, color: '#fb923c' },
+                    { icon: FiSun, label: 'UV Index', value: String(formatUVIndex(weather.current.uv_index)), color: '#fbbf24' },
+                    { icon: FiEye, label: 'Visibility', value: `${(weather.current.visibility / 1000).toFixed(1)} km`, color: '#c084fc' },
+                    { icon: FiActivity, label: 'Pressure', value: `${Math.round(weather.current.pressure)} hPa`, color: '#f472b6' },
                   ].map((m, i) => <MetricPill key={m.label} {...m} delay={0.15 + i * 0.06} />)}
                 </motion.div>
 
@@ -673,10 +634,10 @@ export default function Home() {
                   marginBottom: '28px',
                   alignItems: 'start',
                 }}>
-                  {/* LEFT: Hourly + Week */}
+                  {/* LEFT: Hourly + Interactive Scrubber */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     <HourlyTimeline hourly={weather.hourly_forecast} />
-                    <WeekStrip daily={weather.daily_forecast} />
+                    <SkyDial hourlyForecast={weather.hourly_forecast} />
                   </div>
 
                   {/* RIGHT: AQI + Sunrise/Sunset card */}
@@ -692,8 +653,10 @@ export default function Home() {
                           border: '1px solid var(--border-card)',
                           backdropFilter: 'blur(30px)',
                         }}>
-                        <p style={{ color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
-                          textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem' }}>☀️ Sun Schedule</p>
+                        <p style={{
+                          color: 'var(--text-secondary)', fontWeight: '700', fontSize: '0.75rem',
+                          textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.25rem'
+                        }}>☀️ Sun Schedule</p>
 
                         {/* Sun arc visualization */}
                         <div style={{ position: 'relative', height: '80px', marginBottom: '16px' }}>
@@ -702,18 +665,20 @@ export default function Home() {
                             <motion.circle cx={0} cy={0} r="7" fill="#fbbf24"
                               style={{ filter: 'drop-shadow(0 0 8px #fbbf24)' }}
                               initial={{ offsetDistance: '0%' }}
-                              animate={{ offsetDistance: `${Math.min(
-                                Math.max(0,
-                                  (() => {
-                                    const now = new Date();
-                                    const sr = weather.daily_forecast[0].sunrise ? new Date(weather.daily_forecast[0].sunrise) : null;
-                                    const ss = weather.daily_forecast[0].sunset  ? new Date(weather.daily_forecast[0].sunset)  : null;
-                                    if (!sr || !ss) return 50;
-                                    const total = ss - sr;
-                                    const elapsed = now - sr;
-                                    return Math.round((elapsed / total) * 100);
-                                  })()
-                                ), 100)}%` }}
+                              animate={{
+                                offsetDistance: `${Math.min(
+                                  Math.max(0,
+                                    (() => {
+                                      const now = new Date();
+                                      const sr = weather.daily_forecast[0].sunrise ? new Date(weather.daily_forecast[0].sunrise) : null;
+                                      const ss = weather.daily_forecast[0].sunset ? new Date(weather.daily_forecast[0].sunset) : null;
+                                      if (!sr || !ss) return 50;
+                                      const total = ss - sr;
+                                      const elapsed = now - sr;
+                                      return Math.round((elapsed / total) * 100);
+                                    })()
+                                  ), 100)}%`
+                              }}
                               transition={{ duration: 2, ease: 'easeOut' }}
                             />
                           </svg>
@@ -722,13 +687,17 @@ export default function Home() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                           {[
                             { emoji: '🌅', label: 'Sunrise', val: weather.daily_forecast[0].sunrise ? formatTime(weather.daily_forecast[0].sunrise) : '--', color: '#fbbf24' },
-                            { emoji: '🌇', label: 'Sunset',  val: weather.daily_forecast[0].sunset  ? formatTime(weather.daily_forecast[0].sunset)  : '--', color: '#f87171' },
+                            { emoji: '🌇', label: 'Sunset', val: weather.daily_forecast[0].sunset ? formatTime(weather.daily_forecast[0].sunset) : '--', color: '#f87171' },
                           ].map(({ emoji, label, val, color }) => (
-                            <div key={label} style={{ padding: '12px', borderRadius: '14px',
-                              background: `${color}12`, border: `1px solid ${color}25`, textAlign: 'center' }}>
+                            <div key={label} style={{
+                              padding: '12px', borderRadius: '14px',
+                              background: `${color}12`, border: `1px solid ${color}25`, textAlign: 'center'
+                            }}>
                               <p style={{ fontSize: '1.5rem', marginBottom: '4px' }}>{emoji}</p>
-                              <p style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '700',
-                                textTransform: 'uppercase', marginBottom: '4px' }}>{label}</p>
+                              <p style={{
+                                color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '700',
+                                textTransform: 'uppercase', marginBottom: '4px'
+                              }}>{label}</p>
                               <p style={{ color: color, fontWeight: '800', fontSize: '1rem' }}>{val}</p>
                             </div>
                           ))}
@@ -744,8 +713,10 @@ export default function Home() {
           {/* ── GEO ERROR ── */}
           {geoError && !searched && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              style={{ marginTop: '16px', padding: '12px 18px', borderRadius: '14px',
-                background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)' }}>
+              style={{
+                marginTop: '16px', padding: '12px 18px', borderRadius: '14px',
+                background: 'rgba(248,113,113,0.1)', border: '1px solid rgba(248,113,113,0.3)'
+              }}>
               <p style={{ color: '#f87171', fontSize: '0.85rem' }}>📍 {geoError}</p>
             </motion.div>
           )}

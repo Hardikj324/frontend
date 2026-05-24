@@ -4,6 +4,22 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { getWeatherIcon } from '../utils/weatherHelpers';
 import { API_BASE_URL } from '../utils/constants';
+import { useDarkMode } from '../hooks/useDarkMode';
+import {
+  BsFire,
+  BsSnow,
+  BsWind,
+  BsGlobe,
+  BsArrowDownUp,
+  BsDropletFill,
+  BsThermometerHalf,
+  BsSunFill,
+  BsArrowRepeat,
+  BsSearch,
+  BsExclamationCircle,
+  BsCloudRain,
+  BsSun
+} from 'react-icons/bs';
 
 const API_BASE = API_BASE_URL;
 
@@ -17,15 +33,38 @@ function getCardTheme(code, isDay) {
   return { bg: 'linear-gradient(135deg,#0b1428 0%,#162240 100%)', accent: '#64b5f6', star: false };
 }
 
-function getTempColor(temp) {
+function getTempColor(temp, darkMode = true) {
   if (temp >= 40) return '#ef4444';
   if (temp >= 35) return '#f97316';
-  if (temp >= 28) return '#fbbf24';
-  if (temp >= 18) return '#34d399';
-  if (temp >= 8) return '#60a5fa';
-  if (temp >= 0) return '#93c5fd';
-  return '#bfdbfe';
+  if (temp >= 28) return darkMode ? '#fbbf24' : '#d97706';
+  if (temp >= 18) return darkMode ? '#34d399' : '#059669';
+  if (temp >= 8) return darkMode ? '#60a5fa' : '#2563eb';
+  if (temp >= 0) return darkMode ? '#93c5fd' : '#1d4ed8';
+  return darkMode ? '#bfdbfe' : '#1e3a8a';
 }
+
+const CITY_IMAGES = {
+  "New York": "/cities/new_york.png",
+  "London": "/cities/london.png",
+  "Tokyo": "/cities/tokyo.png",
+  "Paris": "/cities/paris.png",
+  "Dubai": "/cities/dubai.png",
+  "Sydney": "/cities/sydney.png",
+  "Mumbai": "/cities/mumbai.png",
+  "Singapore": "/cities/singapore.png",
+  "Cairo": "/cities/cairo.png",
+  "Rio": "/cities/rio.png",
+  "Moscow": "/cities/moscow.png",
+  "Toronto": "/cities/toronto.png",
+  "Cape Town": "/cities/cape_town.png",
+  "Bangkok": "/cities/bangkok.png",
+  "Berlin": "/cities/berlin.png",
+  "Mexico City": "/cities/mexico_city.png",
+  "Seoul": "/cities/seoul.png",
+  "Istanbul": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&q=80&w=800",
+  "Buenos Aires": "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?auto=format&fit=crop&q=80&w=800",
+  "Lagos": "https://tse3.mm.bing.net/th/id/OIP.aqMhYOuiGnCQXYFUbSYDPwHaFR?rs=1&pid=ImgDetMain&o=7&rm=3",
+};
 
 // ─── Animated canvas for each card ───────────────────────────
 function CardCanvas({ code, isDay, theme }) {
@@ -105,6 +144,8 @@ function CityCard({ city, index, onSelect }) {
   const theme = getCardTheme(city.weather_code, city.is_day);
   const tempColor = getTempColor(city.temperature);
 
+  const cityImg = CITY_IMAGES[city.name];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40, scale: 0.9 }}
@@ -118,6 +159,9 @@ function CityCard({ city, index, onSelect }) {
         position: 'relative', width: '220px', height: '300px', borderRadius: '24px',
         flexShrink: 0, cursor: 'pointer', overflow: 'hidden',
         background: theme.bg,
+        backgroundImage: cityImg ? `url(${cityImg})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         border: `1px solid ${theme.accent}25`,
         boxShadow: hovered ? `0 20px 60px rgba(0,0,0,0.6), 0 0 30px ${theme.accent}20` : '0 8px 32px rgba(0,0,0,0.4)',
         transition: 'box-shadow 0.3s',
@@ -126,7 +170,7 @@ function CityCard({ city, index, onSelect }) {
       <CardCanvas code={city.weather_code} isDay={city.is_day} theme={theme} />
 
       {/* Gradient overlay */}
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.8) 30%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.9) 10%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%)' }} />
 
       {/* Country chip */}
       <div style={{
@@ -145,9 +189,10 @@ function CityCard({ city, index, onSelect }) {
         animate={{ y: hovered ? [0, -6, 0] : 0, rotate: hovered ? [0, 5, -5, 0] : 0 }}
         transition={{ duration: 2, repeat: hovered ? Infinity : 0, ease: 'easeInOut' }}
         style={{
-          position: 'absolute', top: '40px', right: '14px',
-          fontSize: '3rem', filter: `drop-shadow(0 0 12px ${theme.accent}60)`,
+          position: 'absolute', top: '14px', right: '14px',
+          fontSize: '2.5rem',
           lineHeight: 1,
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
         }}
       >
         {getWeatherIcon(city.weather_code, city.is_day)}
@@ -156,8 +201,7 @@ function CityCard({ city, index, onSelect }) {
       {/* Bottom Content */}
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-          <span style={{ fontSize: '1.3rem' }}>{city.emoji}</span>
-          <span style={{ color: '#fff', fontWeight: '900', fontSize: '1.1rem' }}>{city.name}</span>
+          <span style={{ color: '#fff', fontWeight: '900', fontSize: '1.2rem' }}>{city.name}</span>
         </div>
 
         {/* Temperature */}
@@ -180,15 +224,16 @@ function CityCard({ city, index, onSelect }) {
         {/* Mini stats row */}
         <div style={{ display: 'flex', gap: '8px' }}>
           {[
-            { label: '💧', val: `${city.humidity}%` },
-            { label: '💨', val: `${Math.round(city.wind_speed)}km/h` },
-          ].map(({ label, val }) => (
-            <div key={label} style={{
-              flex: 1, textAlign: 'center', padding: '6px 4px',
-              borderRadius: '10px', background: 'rgba(255,255,255,0.08)',
+            { icon: <BsDropletFill />, val: `${city.humidity}%` },
+            { icon: <BsWind />, val: `${Math.round(city.wind_speed)}km/h` },
+          ].map(({ icon, val }, idx) => (
+            <div key={idx} style={{
+              flex: 1, textAlign: 'center', padding: '8px 4px',
+              borderRadius: '12px', background: 'rgba(255,255,255,0.08)',
               border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px'
             }}>
-              <p style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.4)', fontWeight: '700' }}>{label}</p>
+              <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>{icon}</div>
               <p style={{ fontSize: '0.75rem', color: '#fff', fontWeight: '800' }}>{val}</p>
             </div>
           ))}
@@ -239,19 +284,23 @@ function CityModal({ city, onClose, onNavigate }) {
         onClick={e => e.stopPropagation()}
         style={{
           width: '100%', maxWidth: '480px', borderRadius: '32px',
-          background: theme.bg, border: `1px solid ${theme.accent}30`,
+          background: theme.bg,
+          backgroundImage: CITY_IMAGES[city.name] ? `url(${CITY_IMAGES[city.name]})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          border: `1px solid ${theme.accent}30`,
           boxShadow: `0 40px 120px rgba(0,0,0,0.8), 0 0 60px ${theme.accent}15`,
           overflow: 'hidden', position: 'relative',
         }}
       >
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4))' }} />
         <CardCanvas code={city.weather_code} isDay={city.is_day} theme={theme} />
         <div style={{ position: 'relative', zIndex: 1, padding: '32px' }}>
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span style={{ fontSize: '2rem' }}>{city.emoji}</span>
-                <h2 style={{ color: '#fff', fontWeight: '900', fontSize: '1.8rem' }}>{city.name}</h2>
+                <h2 style={{ color: '#fff', fontWeight: '900', fontSize: '2.2rem', letterSpacing: '-0.02em' }}>{city.name}</h2>
               </div>
               <p style={{ color: theme.accent, fontWeight: '700', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                 {city.country}
@@ -282,7 +331,11 @@ function CityModal({ city, onClose, onNavigate }) {
               {Math.round(city.temperature)}
             </motion.span>
             <span style={{ fontSize: '2rem', color: 'rgba(255,255,255,0.5)', marginBottom: '10px' }}>°C</span>
-            <div style={{ marginBottom: '12px', fontSize: '3rem' }}>
+            <div style={{
+              marginLeft: 'auto', marginBottom: '12px', fontSize: '4rem', color: '#fff',
+              filter: `drop-shadow(0 0 20px ${theme.accent}40)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+            }}>
               {getWeatherIcon(city.weather_code, city.is_day)}
             </div>
           </div>
@@ -294,10 +347,10 @@ function CityModal({ city, onClose, onNavigate }) {
           {/* Stats grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '24px' }}>
             {[
-              { icon: '💧', label: 'Humidity', value: `${city.humidity}%` },
-              { icon: '💨', label: 'Wind Speed', value: `${Math.round(city.wind_speed)} km/h` },
-              { icon: '🌡️', label: 'Feels Like', value: `${Math.round(city.feels_like)}°C` },
-              { icon: '☀️', label: 'UV Index', value: city.uv_index != null ? String(Math.round(city.uv_index)) : 'N/A' },
+              { icon: <BsDropletFill />, label: 'Humidity', value: `${city.humidity}%` },
+              { icon: <BsWind />, label: 'Wind Speed', value: `${Math.round(city.wind_speed)} km/h` },
+              { icon: <BsThermometerHalf />, label: 'Feels Like', value: `${Math.round(city.feels_like)}°C` },
+              { icon: <BsSunFill />, label: 'UV Index', value: city.uv_index != null ? String(Math.round(city.uv_index)) : 'N/A' },
             ].map(({ icon, label, value }) => (
               <div key={label} style={{
                 padding: '14px', borderRadius: '16px',
@@ -305,9 +358,10 @@ function CityModal({ city, onClose, onNavigate }) {
                 border: `1px solid ${theme.accent}20`,
                 backdropFilter: 'blur(10px)',
               }}>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>
-                  {icon} {label}
-                </p>
+                <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {icon}
+                  <span style={{ fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+                </div>
                 <p style={{ color: '#fff', fontWeight: '900', fontSize: '1.1rem' }}>{value}</p>
               </div>
             ))}
@@ -333,22 +387,22 @@ function CityModal({ city, onClose, onNavigate }) {
 }
 
 // ─── Temperature Legend ───────────────────────────────────────
-function TempLegend() {
+function TempLegend({ darkMode }) {
   const bands = [
-    { label: '40°+', color: '#ef4444', desc: 'Extreme Heat' },
-    { label: '35°', color: '#f97316', desc: 'Very Hot' },
-    { label: '28°', color: '#fbbf24', desc: 'Warm' },
-    { label: '18°', color: '#34d399', desc: 'Mild' },
-    { label: '8°', color: '#60a5fa', desc: 'Cool' },
-    { label: '0°', color: '#93c5fd', desc: 'Cold' },
-    { label: '<0°', color: '#bfdbfe', desc: 'Freezing' },
+    { label: '40°+', color: getTempColor(40, darkMode), desc: 'Extreme Heat' },
+    { label: '35°', color: getTempColor(35, darkMode), desc: 'Very Hot' },
+    { label: '28°', color: getTempColor(28, darkMode), desc: 'Warm' },
+    { label: '18°', color: getTempColor(18, darkMode), desc: 'Mild' },
+    { label: '8°', color: getTempColor(8, darkMode), desc: 'Cool' },
+    { label: '0°', color: getTempColor(0, darkMode), desc: 'Cold' },
+    { label: '<0°', color: getTempColor(-5, darkMode), desc: 'Freezing' },
   ];
   return (
     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
       {bands.map(({ label, color, desc }) => (
         <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0 }} />
-          <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>{label}</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: '700' }}>{label}</span>
         </div>
       ))}
     </div>
@@ -356,7 +410,7 @@ function TempLegend() {
 }
 
 // ─── Stats Summary Bar ────────────────────────────────────────
-function WorldStats({ cities }) {
+function WorldStats({ cities, darkMode }) {
   const hottest = cities.reduce((a, b) => (a.temperature > b.temperature ? a : b), cities[0]);
   const coldest = cities.reduce((a, b) => (a.temperature < b.temperature ? a : b), cities[0]);
   const windiest = cities.reduce((a, b) => (a.wind_speed > b.wind_speed ? a : b), cities[0]);
@@ -371,10 +425,10 @@ function WorldStats({ cities }) {
       }}
     >
       {[
-        { icon: '🔥', label: 'Hottest City', value: hottest?.name, sub: `${Math.round(hottest?.temperature)}°C`, color: '#ef4444' },
-        { icon: '🥶', label: 'Coldest City', value: coldest?.name, sub: `${Math.round(coldest?.temperature)}°C`, color: '#93c5fd' },
-        { icon: '💨', label: 'Windiest City', value: windiest?.name, sub: `${Math.round(windiest?.wind_speed)} km/h`, color: '#a3e635' },
-        { icon: '🌍', label: 'World Avg Temp', value: `${avgTemp}°C`, sub: `Across ${cities.length} cities`, color: '#fbbf24' },
+        { icon: <BsFire size={20} />, label: 'Hottest City', value: hottest?.name, sub: `${Math.round(hottest?.temperature)}°C`, color: getTempColor(hottest?.temperature, darkMode) },
+        { icon: <BsSnow size={20} />, label: 'Coldest City', value: coldest?.name, sub: `${Math.round(coldest?.temperature)}°C`, color: getTempColor(coldest?.temperature, darkMode) },
+        { icon: <BsWind size={20} />, label: 'Windiest City', value: windiest?.name, sub: `${Math.round(windiest?.wind_speed)} km/h`, color: darkMode ? '#a3e635' : '#65a30d' },
+        { icon: <BsGlobe size={20} />, label: 'World Avg Temp', value: `${avgTemp}°C`, sub: `Across ${cities.length} cities`, color: getTempColor(parseFloat(avgTemp), darkMode) },
       ].map(({ icon, label, value, sub, color }) => (
         <motion.div key={label}
           whileHover={{ scale: 1.03, y: -2 }}
@@ -385,7 +439,14 @@ function WorldStats({ cities }) {
             backdropFilter: 'blur(20px)',
           }}
         >
-          <p style={{ fontSize: '1.4rem', marginBottom: '6px' }}>{icon}</p>
+          <div style={{
+            width: '40px', height: '40px', borderRadius: '10px',
+            background: `${color}15`, color: color,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            marginBottom: '10px'
+          }}>
+            {icon}
+          </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>{label}</p>
           <p style={{ color, fontWeight: '900', fontSize: '1rem' }}>{value}</p>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>{sub}</p>
@@ -397,10 +458,10 @@ function WorldStats({ cities }) {
 
 // ─── Custom Sort Dropdown ─────────────────────────────────────
 const SORT_OPTIONS = [
-  { value: 'default', icon: '🔀', label: 'Default Order' },
-  { value: 'temp_desc', icon: '🔥', label: 'Hottest First' },
-  { value: 'temp_asc', icon: '❄️', label: 'Coldest First' },
-  { value: 'wind', icon: '💨', label: 'Windiest First' },
+  { value: 'default', icon: <BsArrowDownUp />, label: 'Default Order' },
+  { value: 'temp_desc', icon: <BsFire />, label: 'Hottest First' },
+  { value: 'temp_asc', icon: <BsSnow />, label: 'Coldest First' },
+  { value: 'wind', icon: <BsWind />, label: 'Windiest First' },
 ];
 
 function SortDropdown({ sortBy, setSortBy }) {
@@ -422,7 +483,7 @@ function SortDropdown({ sortBy, setSortBy }) {
         onClick={() => setOpen(!open)}
         style={{
           display: 'flex', alignItems: 'center', gap: '8px',
-          padding: '8px 14px', borderRadius: '99px', cursor: 'pointer', border: 'none',
+          padding: '8px 14px', borderRadius: '99px', cursor: 'pointer',
           background: open ? 'var(--bg-input)' : 'var(--bg-card)',
           border: open ? '1px solid var(--border-input)' : '1px solid var(--border-card)',
           backdropFilter: 'blur(16px)',
@@ -500,6 +561,7 @@ function SortDropdown({ sortBy, setSortBy }) {
 export default function SkyStories() {
   const { token } = useAuthStore();
   const navigate = useNavigate();
+  const { darkMode } = useDarkMode();
 
   const [cities, setCities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -535,11 +597,22 @@ export default function SkyStories() {
     if (filter === 'cold') c = c.filter(x => x.temperature < 10);
     if (filter === 'rainy') c = c.filter(x => x.weather_code >= 50 && x.weather_code < 80);
     if (filter === 'clear') c = c.filter(x => x.weather_code <= 3);
-    if (sortBy === 'temp_desc') c.sort((a, b) => b.temperature - a.temperature);
     if (sortBy === 'temp_asc') c.sort((a, b) => a.temperature - b.temperature);
     if (sortBy === 'wind') c.sort((a, b) => b.wind_speed - a.wind_speed);
     return c;
   }, [cities, filter, sortBy]);
+
+  // Derive global extremes
+  const worldStats = useMemo(() => {
+    if (cities.length === 0) return null;
+    const sortedTemp = [...cities].sort((a, b) => b.temperature - a.temperature);
+    const sortedWind = [...cities].sort((a, b) => b.wind_speed - a.wind_speed);
+    return {
+      hot: sortedTemp[0],
+      cold: sortedTemp[sortedTemp.length - 1],
+      windy: sortedWind[0]
+    };
+  }, [cities]);
 
   const handleCityNavigate = (city) => {
     navigate(`/?city=${encodeURIComponent(city.name)}&lat=${city.lat}&lng=${city.lon}`);
@@ -565,7 +638,7 @@ export default function SkyStories() {
         ))}
       </div>
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: '1400px', margin: '0 auto', padding: '80px 24px 60px' }}>
+      <div style={{ position: 'relative', zIndex: 1, padding: '80px 24px 120px' }}>
 
         {/* ── HEADER ── */}
         <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: '40px' }}>
@@ -576,15 +649,20 @@ export default function SkyStories() {
                 background: 'var(--text-primary)',
                 WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                 letterSpacing: '-2px', marginBottom: '8px',
+                display: 'flex', alignItems: 'center', gap: '12px'
               }}>
-                🌍 Sky Stories
+                <BsGlobe style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--accent)' }} />
+                Sky Stories
               </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '500' }}>
-                Live weather from 20 cities across the globe · refreshed now
-                {lastRefresh && <span style={{ color: 'var(--text-muted)', marginLeft: '8px' }}>
-                  at {lastRefresh.toLocaleTimeString()}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: '500' }}>
+                  Live weather from iconic world cities · refreshed now
+                </p>
+
+                {lastRefresh && <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  • {lastRefresh.toLocaleTimeString()}
                 </span>}
-              </p>
+              </div>
             </div>
             <motion.button
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -597,41 +675,85 @@ export default function SkyStories() {
                 display: 'flex', alignItems: 'center', gap: '8px',
               }}
             >
-              {loading ? <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} style={{ width: '16px', height: '16px', border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff', borderRadius: '50%' }} /> : '🔄'} Refresh
+              {loading ? (
+                <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }} style={{ display: 'flex' }}>
+                  <BsArrowRepeat size={18} />
+                </motion.div>
+              ) : <BsArrowRepeat size={18} />}
+              Refresh
             </motion.button>
           </div>
 
-          {/* World Stats */}
-          {cities.length > 0 && <WorldStats cities={cities} />}
+          {/* ── WORLD EXTREMES BAR ── */}
+          {worldStats && !loading && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              style={{
+                display: 'flex', gap: '16px', marginBottom: '32px', flexWrap: 'wrap',
+              }}>
+              {[
+                { label: 'Hottest', city: worldStats.hot.name, value: `${Math.round(worldStats.hot.temperature)}°`, icon: <BsFire />, color: '#ef4444' },
+                { label: 'Coldest', city: worldStats.cold.name, value: `${Math.round(worldStats.cold.temperature)}°`, icon: <BsSnow />, color: '#3b82f6' },
+                { label: 'Windiest', city: worldStats.windy.name, value: `${Math.round(worldStats.windy.wind_speed)} km/h`, icon: <BsWind />, color: '#2dd4bf' }
+              ].map((stat, i) => (
+                <motion.div key={i} whileHover={{ y: -4 }}
+                  style={{
+                    flex: '1', minWidth: '200px', padding: '16px 20px', borderRadius: '20px',
+                    background: 'var(--bg-card)', border: '1px solid var(--border-card)',
+                    backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', gap: '16px',
+                  }}>
+                  <div style={{
+                    width: '44px', height: '44px', borderRadius: '12px',
+                    background: `${stat.color}15`, color: stat.color,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem',
+                    filter: `drop-shadow(0 0 8px ${stat.color}40)`
+                  }}>
+                    {stat.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {stat.label}
+                    </div>
+                    <div style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>
+                      {stat.value} <span style={{ fontSize: '0.85rem', fontWeight: '500', color: 'var(--text-secondary)' }}>in {stat.city}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
 
           {/* Controls */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {[
-                { key: 'all', label: '🌐 All' },
-                { key: 'hot', label: '🔥 Hot' },
-                { key: 'cold', label: '🥶 Cold' },
-                { key: 'rainy', label: '🌧️ Rainy' },
-                { key: 'clear', label: '☀️ Clear' },
-              ].map(({ key, label }) => (
+                { key: 'all', label: 'All', icon: <BsGlobe />, color: '#4f8ef7' },
+                { key: 'hot', label: 'Hot', icon: <BsFire />, color: '#ef4444' },
+                { key: 'cold', label: 'Cold', icon: <BsSnow />, color: '#3b82f6' },
+                { key: 'rainy', label: 'Rainy', icon: <BsCloudRain />, color: '#60a5fa' },
+                { key: 'clear', label: 'Clear', icon: <BsSun />, color: '#fbbf24' },
+              ].map(({ key, label, icon, color }) => (
                 <motion.button key={key} whileTap={{ scale: 0.95 }}
                   onClick={() => setFilter(key)}
                   style={{
-                    padding: '7px 14px', borderRadius: '99px', border: 'none', cursor: 'pointer',
-                    background: filter === key ? 'var(--accent-subtle)' : 'var(--bg-card)',
-                    color: filter === key ? 'var(--accent)' : 'var(--text-secondary)',
+                    padding: '8px 16px', borderRadius: '99px', cursor: 'pointer',
+                    background: filter === key ? `${color}15` : 'var(--bg-card)',
+                    color: filter === key ? color : 'var(--text-secondary)',
                     fontSize: '0.8rem', fontWeight: '700',
-                    border: filter === key ? '1px solid var(--border-input-focus)' : '1px solid var(--border-card)',
+                    border: filter === key ? `1px solid ${color}40` : '1px solid var(--border-card)',
                     backdropFilter: 'blur(10px)',
+                    display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s',
                   }}
-                >{label}</motion.button>
+                >
+                  <span style={{ fontSize: '1rem', display: 'flex', color: filter === key ? color : 'var(--text-muted)' }}>{icon}</span>
+                  {label}
+                </motion.button>
               ))}
             </div>
 
             <SortDropdown sortBy={sortBy} setSortBy={setSortBy} />
 
             <div style={{ marginLeft: 'auto' }}>
-              <TempLegend />
+              <TempLegend darkMode={darkMode} />
             </div>
           </div>
         </motion.div>
@@ -659,7 +781,9 @@ export default function SkyStories() {
             borderRadius: '24px', background: 'rgba(239,68,68,0.08)',
             border: '1px solid rgba(239,68,68,0.2)',
           }}>
-            <p style={{ fontSize: '3rem', marginBottom: '12px' }}>⚠️</p>
+            <p style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', color: '#ef4444' }}>
+              <BsExclamationCircle size={48} />
+            </p>
             <p style={{ color: '#ef4444', fontWeight: '700', marginBottom: '16px' }}>{error}</p>
             <button onClick={fetchPulse} style={{
               padding: '10px 24px', borderRadius: '50px', background: 'rgba(239,68,68,0.15)',
@@ -673,7 +797,9 @@ export default function SkyStories() {
           <>
             {filtered.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '5rem', color: 'var(--text-muted)' }}>
-                <p style={{ fontSize: '3rem' }}>🌐</p>
+                <p style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+                  <BsSearch size={48} />
+                </p>
                 <p style={{ fontWeight: '700', marginTop: '12px' }}>No cities match this filter</p>
               </div>
             ) : (

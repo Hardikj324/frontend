@@ -103,7 +103,7 @@ export default function AlertsPage() {
                 onClick={() => setActiveTab(key)}
                 whileTap={{ scale: 0.97 }}
                 style={{
-                  padding: '8px 20px', borderRadius: '10px', border: 'none', cursor: 'pointer',
+                  padding: '8px 20px', borderRadius: '10px', cursor: 'pointer',
                   background: activeTab === key ? 'rgba(251,146,60,0.15)' : 'transparent',
                   color: activeTab === key ? '#fb923c' : 'rgba(255,255,255,0.45)',
                   fontWeight: '800', fontSize: '0.85rem',

@@ -294,7 +294,7 @@ export default function Forecast() {
             <motion.button key={i} onClick={() => setActiveDay(i)}
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}
               style={{
-                flex: '0 0 auto', minWidth: '85px', borderRadius: '16px', border: 'none', cursor: 'pointer',
+                flex: '0 0 auto', minWidth: '85px', borderRadius: '16px', cursor: 'pointer',
                 padding: '12px 10px', textAlign: 'center', transition: 'all 0.25s',
                 background: activeDay === i
                   ? `linear-gradient(160deg, ${pal.from}, ${pal.to})`
@@ -453,7 +453,7 @@ export default function Forecast() {
               ].map(m => (
                 <button key={m.id} onClick={() => setChartMetric(m.id)}
                   style={{
-                    padding: '8px 16px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: '700', fontSize: '0.82rem',
+                    padding: '8px 16px', borderRadius: '10px', cursor: 'pointer', fontWeight: '700', fontSize: '0.82rem',
                     background: chartMetric === m.id ? m.color : 'var(--bg-card)',
                     color: chartMetric === m.id ? '#000' : 'var(--text-secondary)',
                     border: `1px solid ${chartMetric === m.id ? m.color : 'var(--border-card)'}`,

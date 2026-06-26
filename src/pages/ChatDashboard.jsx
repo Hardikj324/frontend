@@ -74,8 +74,7 @@ export default function ChatDashboard() {
         setMessages(data.messages || []);
 
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = window.location.hostname === 'localhost' ? 'localhost:8000' : window.location.host;
-        const wsUrl = `${protocol}//${host}/api/chat/ws/${encodeURIComponent(roomName)}?token=${token}`;
+        const wsUrl = `${protocol}//${window.location.host}/api/chat/ws/${encodeURIComponent(roomName)}?token=${token}`;
 
         socket = new WebSocket(wsUrl);
 
